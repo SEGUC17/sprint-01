@@ -4,8 +4,6 @@
 	},
 	"database": {
 		"uri": "mongodb://localhost:27017/test-db",
-		"seeding": {
-			"reseed": true
-		}
+		"reseed": true
 	}
 }
