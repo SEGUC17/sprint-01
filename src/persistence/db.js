@@ -19,6 +19,36 @@ class Database {
 
   /** Businesses */
 
+  insertOneBusiness(business) {
+    return new Promise((resolve, reject) => {
+      this.db.collection('businesses').insertOne(business,
+        ((err, data) => {
+          if (err) reject(err);
+          resolve(data.ops[0]);
+        }));
+    });
+  }
+
+  insertBusinesses(businesses) {
+    return new Promise((resolve, reject) => {
+      this.db.collection('businesses').insert(businesses,
+        ((err, data) => {
+          if (err) reject(err);
+          resolve(data.ops);
+        }));
+    });
+  }
+
+  getBusinessesCount() {
+    return new Promise((resolve, reject) => {
+      this.db.collection('businesses').find({})
+        .count((err, data) => {
+          if (err) reject(err);
+          resolve(data);
+        });
+    });
+  }
+
   getAllBusinesses() {
     return new Promise((resolve, reject) => {
       this.db.collection('businesses').find({})
@@ -56,9 +86,9 @@ class Database {
         _id
       }, [], {
           $set: modifications
-        }, {}, (err, data) => {
+        }, { new: true }, (err, data) => {
           if (err) reject(err);
-          resolve(data);
+          resolve(data.value);
         });
     });
   }
