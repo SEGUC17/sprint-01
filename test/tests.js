@@ -70,19 +70,14 @@ describe('Database', () => {
     });
 
     it('should modify one business by _id', () => {
-      let _idOriginal;
-
       return Promise.resolve()
         .then(() => db.insertBusinesses(businesses))
-        .then(([{ _id }]) => {
-          _idOriginal = _id;
-          return db.modifyOneBusiness({ _id }, { name: 'Hardees' });
-        })
-        .then(() => db.getOneBusiness({ _id: _idOriginal }))
+        .then(([{ _id }]) => db.modifyOneBusiness({ _id }, { name: 'Hardees' }))
+        .then(() => db.getOneBusiness({ _id: businesses[0]._id }))
         .then((business) => {
           expect(business)
             .to.have.property('_id')
-            .that.deep.equals(_idOriginal);
+            .that.deep.equals(businesses[0]._id);
           expect(business)
             .to.have.property('name')
             .that.not.deep.equals(businesses[0].name);
