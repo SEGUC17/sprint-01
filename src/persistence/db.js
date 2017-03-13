@@ -9,11 +9,12 @@ class Database {
 
   connect() {
     return new Promise((resolve, reject) => {
-      MongoClient.connect(this.config.uri, (err, db) => {
-        if (err) reject(err);
-        this.db = db;
-        resolve(this);
-      });
+      MongoClient
+        .connect(this.config.uri, (err, db) => {
+          if (err) reject(err);
+          this.db = db;
+          resolve(this);
+        });
     });
   }
 
@@ -21,8 +22,8 @@ class Database {
 
   insertOneBusiness(business) {
     return new Promise((resolve, reject) => {
-      this.db.collection('businesses').insertOne(business,
-        ((err, data) => {
+      this.db.collection('businesses')
+        .insertOne(business, ((err, data) => {
           if (err) reject(err);
           resolve(data.ops[0]);
         }));
@@ -31,28 +32,28 @@ class Database {
 
   insertBusinesses(businesses) {
     return new Promise((resolve, reject) => {
-      this.db.collection('businesses').insert(businesses,
-        ((err, data) => {
+      this.db.collection('businesses')
+        .insert(businesses, ((err, data) => {
           if (err) reject(err);
           resolve(data.ops);
         }));
     });
   }
 
-  getBusinessesCount() {
+  getAllBusinesses() {
     return new Promise((resolve, reject) => {
-      this.db.collection('businesses').find({})
-        .count((err, data) => {
+      this.db.collection('businesses')
+        .find({}).toArray((err, data) => {
           if (err) reject(err);
           resolve(data);
         });
     });
   }
 
-  getAllBusinesses() {
+  getBusinessesCount() {
     return new Promise((resolve, reject) => {
-      this.db.collection('businesses').find({})
-        .toArray((err, data) => {
+      this.db.collection('businesses')
+        .find({}).count((err, data) => {
           if (err) reject(err);
           resolve(data);
         });
@@ -61,8 +62,8 @@ class Database {
 
   searchBusinesses(query) {
     return new Promise((resolve, reject) => {
-      this.db.collection('businesses').find(query)
-        .toArray((err, data) => {
+      this.db.collection('businesses')
+        .find(query).toArray((err, data) => {
           if (err) reject(err);
           resolve(data);
         });
@@ -71,22 +72,19 @@ class Database {
 
   getOneBusiness({ _id }) {
     return new Promise((resolve, reject) => {
-      this.db.collection('businesses').findOne({
-        _id
-      }, (err, data) => {
-        if (err) reject(err);
-        resolve(data);
-      });
+      this.db.collection('businesses')
+        .findOne({ _id }, (err, data) => {
+          if (err) reject(err);
+          resolve(data);
+        });
     });
   }
 
-  modifyOneBusiness({ _id }, modifications) {
+  modifyOneBusiness({ _id }, edits) {
     return new Promise((resolve, reject) => {
-      this.db.collection('businesses').findAndModify({
-        _id
-      }, [], {
-          $set: modifications
-        }, { new: true }, (err, data) => {
+      this.db.collection('businesses')
+        .findAndModify({ _id }, [],
+        { $set: edits }, { new: true }, (err, data) => {
           if (err) reject(err);
           resolve(data.value);
         });
@@ -95,12 +93,12 @@ class Database {
 
   deleteOneBusiness({ _id }) {
     return new Promise((resolve, reject) => {
-      this.db.collection('businesses').deleteOne({
-        _id
-      }, (err, data) => {
-        if (err) reject(err);
-        resolve(data);
-      });
+      this.db.collection('businesses')
+        .findAndModify({ _id }, [],
+        {}, { remove: true }, (err, data) => {
+          if (err) reject(err);
+          resolve(data.value);
+        });
     });
   }
 

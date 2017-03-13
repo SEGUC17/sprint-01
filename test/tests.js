@@ -30,22 +30,14 @@ describe('Database', () => {
 
     it('should insert one business', () => {
       return Promise.resolve()
-        .then(() => expect(db.getBusinessesCount())
-          .to.eventually.equal(0))
         .then(() => expect(db.insertOneBusiness(businesses[0]))
-          .to.eventually.deep.equal(businesses[0]))
-        .then(() => expect(db.getBusinessesCount())
-          .to.eventually.equal(1));
+          .to.eventually.deep.equal(businesses[0]));
     });
 
-    it('should insert businesses', () => {
+    it('should insert all businesses', () => {
       return Promise.resolve()
-        .then(() => expect(db.getBusinessesCount())
-          .to.eventually.equal(0))
         .then(() => expect(db.insertBusinesses(businesses))
-          .to.eventually.deep.equal(businesses))
-        .then(() => expect(db.getBusinessesCount())
-          .to.eventually.equal(businesses.length));
+          .to.eventually.deep.equal(businesses));
     });
 
     it('should get all businesses', () => {
@@ -55,11 +47,18 @@ describe('Database', () => {
           .to.eventually.deep.equal(businesses));
     });
 
-    it('should search businesses', () => {
+    it('should count all businesses', () => {
       return Promise.resolve()
         .then(() => db.insertBusinesses(businesses))
-        .then(() => expect(db.searchBusinesses({ name: 'KFC' }))
-          .to.eventually.deep.equal(businesses.filter(({ name }) => name === 'KFC')));
+        .then(() => expect(db.getBusinessesCount())
+          .to.eventually.equal(businesses.length));
+    });
+
+    it('should search all businesses', () => {
+      return Promise.resolve()
+        .then(() => db.insertBusinesses(businesses))
+        .then(() => expect(db.searchBusinesses({ name: businesses[0].name }))
+          .to.eventually.deep.equal(businesses.filter(({ name }) => name === businesses[0].name)));
     });
 
     it('should get one business by _id', () => {
@@ -72,29 +71,25 @@ describe('Database', () => {
     it('should modify one business by _id', () => {
       return Promise.resolve()
         .then(() => db.insertBusinesses(businesses))
-        .then(([{ _id }]) => db.modifyOneBusiness({ _id }, { name: 'Hardees' }))
-        .then(() => db.getOneBusiness({ _id: businesses[0]._id }))
-        .then((business) => {
-          expect(business)
+        .then(([{ _id }]) => db.modifyOneBusiness({ _id }, { name: 'Drumpf' }))
+        .then((data) => {
+          expect(data)
             .to.have.property('_id')
             .that.deep.equals(businesses[0]._id);
-          expect(business)
+          expect(data)
             .to.have.property('name')
             .that.not.deep.equals(businesses[0].name);
-          expect(business)
+          expect(data)
             .to.have.property('description')
             .that.deep.equals(businesses[0].description);
-        })
-        .then(() => expect(db.getBusinessesCount())
-          .to.eventually.equal(businesses.length));
+        });
     });
 
-    it('should delete business by _id', () => {
+    it('should delete one business by _id', () => {
       return Promise.resolve()
         .then(() => db.insertBusinesses(businesses))
-        .then(([{ _id }]) => db.deleteOneBusiness({ _id }))
-        .then(() => expect(db.getBusinessesCount())
-          .to.eventually.equal(businesses.length - 1));
+        .then(([{ _id }]) => expect(db.deleteOneBusiness({ _id }))
+          .to.eventually.deep.equal(businesses[0]));
     });
   });
 });
