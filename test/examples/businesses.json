@@ -1,0 +1,40 @@
+[
+  {
+    "name": "KFC",
+    "description": "American fast food restaurant chain that specializes in fried chicken",
+    "location": "https://goo.gl/maps/VkT8Esek9Wp",
+    "openingHours": {
+      "from": 12,
+      "to": 2
+    },
+    "media": {
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/b/bf/KFC_logo.svg/1024px-KFC_logo.svg.png",
+      "gallery": null
+    },
+    "contactInfo": {
+      "telephone": 19019,
+      "website": "https://www.kfc.com/",
+      "facebook": "https://www.facebook.com/kfc",
+      "twitter": "https://twitter.com/kfc"
+    }
+  },
+  {
+    "name": "McDonald's",
+    "description": "American hamburger and fast food restaurant chain",
+    "location": "https://goo.gl/maps/VkT8Esek9Wp",
+    "openingHours": {
+      "from": 8,
+      "to": 22
+    },
+    "media": {
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png",
+      "gallery": null
+    },
+    "contactInfo": {
+      "telephone": 19991,
+      "website": "https://www.mcdonalds.com/",
+      "facebook": "https://www.facebook.com/mcdonalds/",
+      "twitter": "https://twitter.com/mcdonalds"
+    }
+  }
+]
