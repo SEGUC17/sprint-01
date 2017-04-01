@@ -1,7 +1,6 @@
 import { MongoClient } from 'mongodb';
 
 export default class Database {
-
   /** Construction, Connection & Destruction */
 
   constructor(config) {
