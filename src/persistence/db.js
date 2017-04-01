@@ -1,6 +1,9 @@
 import { MongoClient } from 'mongodb';
 
 export default class Database {
+
+  /** Construction, Connection & Destruction */
+
   constructor(config) {
     this.db = {};
     this.config = config;
@@ -16,6 +19,10 @@ export default class Database {
           resolve(this);
         });
     });
+  }
+
+  drop() {
+    this.db.dropDatabase();
   }
 
   /** Businesses */
@@ -100,9 +107,5 @@ export default class Database {
           resolve(data.value);
         });
     });
-  }
-
-  drop() {
-    this.db.dropDatabase();
   }
 }
