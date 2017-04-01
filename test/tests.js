@@ -1,9 +1,9 @@
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 
-const Database = require('../src/persistence/db');
-const config = require('../src/config/main.json');
-const businesses = require('./examples/businesses.json');
+import Database from '../src/persistence/db';
+import config from '../src/config/main.json';
+import businesses from './examples/businesses.json';
 
 const expect = chai.expect;
 chai.use(chaiAsPromised);

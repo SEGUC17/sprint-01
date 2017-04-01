@@ -1,6 +1,6 @@
-const { Router } = require('express');
+import { Router } from 'express';
 
-const api = ({ db }) => {
+export default ({ db }) => {
   const api = Router();
 
   api.get('/', (req, res) => {
@@ -205,5 +205,3 @@ const api = ({ db }) => {
 
   return api;
 };
-
-module.exports = api;
