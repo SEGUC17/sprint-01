@@ -8,6 +8,7 @@ export default ({ db, jwt, config }) => {
 
   const invalidTokenError = new Error('Invalid token');
   const userNotFoundError = new Error('User not found');
+  const notAdminError = new Error('Not admin');
 
   /** Helpers */
 
@@ -98,7 +99,13 @@ export default ({ db, jwt, config }) => {
 
   // List all business signups (for admins)
   api.get('/business-registrations', (req, res) => {
-    res.json({});
+    verifyJWT(req).then(async (token) => {
+      if (isAdminJWT(token)) {
+        const collection = await db.getAllBusinessRegistrations();
+        return res.status(200).json({ error: null, data: { collection } });
+      }
+      return res.status(403).json({ error: notAdminError.message, data: null });
+    }).catch(() => res.status(401).json({ error: invalidTokenError.message, data: null }));
   });
 
   // View business signup (for admins)
