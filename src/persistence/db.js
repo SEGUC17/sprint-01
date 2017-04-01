@@ -1,6 +1,6 @@
-const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
 
-class Database {
+export default class Database {
   constructor(config) {
     this.db = {};
     this.config = config;
@@ -106,5 +106,3 @@ class Database {
     this.db.dropDatabase();
   }
 }
-
-module.exports = Database;

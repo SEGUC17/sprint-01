@@ -1,9 +1,9 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const http = require('http');
-const Database = require('./persistence/db');
-const api = require('./routes/api');
-const config = require('./config/main.json');
+import express from 'express';
+import bodyParser from 'body-parser';
+import http from 'http';
+import Database from './persistence/db';
+import api from './routes/api';
+import config from './config/main.json';
 
 const app = express();
 app.server = http.createServer(app);
