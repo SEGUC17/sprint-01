@@ -1,13 +1,41 @@
 import { Router } from 'express';
+import _ from 'lodash';
 
-export default ({ db }) => {
+export default ({ db, jwt, config }) => {
   const api = Router();
 
-  api.get('/', (req, res) => {
-    res.json({ hello: 'world' });
+  /** Errors */
+
+  const invalidTokenError = new Error('Invalid token');
+  const userNotFoundError = new Error('User not found');
+
+  /** Helpers */
+
+  const verifyJWT = req => new Promise((resolve, reject) => {
+    const token = req.headers[config.header];
+    try {
+      resolve(jwt.verify(token, config.secret));
+    } catch (err) {
+      reject(invalidTokenError);
+    }
   });
 
-  /** Authentication */
+  const isAdminJWT = (token) => {
+    const { role } = token;
+    return role === 'ADMIN';
+  };
+
+  const isBusinessJWT = (token) => {
+    const { role } = token;
+    return role === 'BUSINESS';
+  };
+
+  const isClientJWT = (token) => {
+    const { role } = token;
+    return role === 'CLIENT';
+  };
+
+  /** Signup & Login */
 
   // Signup (for businesses & clients)
   api.post('/signup', (req, res) => {
@@ -15,8 +43,28 @@ export default ({ db }) => {
   });
 
   // Login (for businesses, clients & admins)
-  api.post('/login', (req, res) => {
-    res.json({});
+  api.post('/login', async (req, res) => {
+    const { body: { username, password } } = req;
+
+    const adminResults = await db.searchAdmins({ username, password });
+    if (!_.isEmpty(adminResults)) {
+      const token = jwt.sign({ username, role: 'ADMIN' }, config.secret);
+      return res.status(200).json({ error: null, data: { token } });
+    }
+
+    const businessResults = await db.searchBusinesses({ username, password });
+    if (!_.isEmpty(businessResults)) {
+      const token = jwt.sign({ username, role: 'BUSINESS' }, config.secret);
+      return res.status(200).json({ error: null, data: { token } });
+    }
+
+    const clientResults = await db.searchClients({ username, password });
+    if (!_.isEmpty(clientResults)) {
+      const token = jwt.sign({ username, role: 'CLIENT' }, config.secret);
+      return res.status(200).json({ error: null, data: { token } });
+    }
+
+    return res.status(404).json({ error: userNotFoundError.message, data: null });
   });
 
   /** Businesses */
