@@ -1,40 +1,10 @@
 import { Router } from 'express';
 import _ from 'lodash';
+import jwt from '../auth/jwt';
+import errors from '../validation/errors';
 
-export default ({ db, jwt, config }) => {
+export default ({ db }) => {
   const api = Router();
-
-  /** Errors */
-
-  const invalidTokenError = new Error('Invalid token');
-  const userNotFoundError = new Error('User not found');
-  const notAdminError = new Error('Not admin');
-
-  /** Helpers */
-
-  const verifyJWT = req => new Promise((resolve, reject) => {
-    const token = req.headers[config.header];
-    try {
-      resolve(jwt.verify(token, config.secret));
-    } catch (err) {
-      reject(invalidTokenError);
-    }
-  });
-
-  const isAdminJWT = (token) => {
-    const { role } = token;
-    return role === 'ADMIN';
-  };
-
-  const isBusinessJWT = (token) => {
-    const { role } = token;
-    return role === 'BUSINESS';
-  };
-
-  const isClientJWT = (token) => {
-    const { role } = token;
-    return role === 'CLIENT';
-  };
 
   /** Signup & Login */
 
@@ -49,23 +19,23 @@ export default ({ db, jwt, config }) => {
 
     const adminResults = await db.searchAdmins({ username, password });
     if (!_.isEmpty(adminResults)) {
-      const token = jwt.sign({ username, role: 'ADMIN' }, config.secret);
+      const token = jwt.sign({ username, role: 'ADMIN' });
       return res.status(200).json({ error: null, data: { token } });
     }
 
     const businessResults = await db.searchBusinesses({ username, password });
     if (!_.isEmpty(businessResults)) {
-      const token = jwt.sign({ username, role: 'BUSINESS' }, config.secret);
+      const token = jwt.sign({ username, role: 'BUSINESS' });
       return res.status(200).json({ error: null, data: { token } });
     }
 
     const clientResults = await db.searchClients({ username, password });
     if (!_.isEmpty(clientResults)) {
-      const token = jwt.sign({ username, role: 'CLIENT' }, config.secret);
+      const token = jwt.sign({ username, role: 'CLIENT' });
       return res.status(200).json({ error: null, data: { token } });
     }
 
-    return res.status(404).json({ error: userNotFoundError.message, data: null });
+    return res.status(404).json({ error: errors.userNotFound.message, data: null });
   });
 
   /** Businesses */
@@ -99,13 +69,13 @@ export default ({ db, jwt, config }) => {
 
   // List all business signups (for admins)
   api.get('/business-registrations', (req, res) => {
-    verifyJWT(req).then(async (token) => {
-      if (isAdminJWT(token)) {
+    jwt.verify(req).then(async (token) => {
+      if (jwt.isAdmin(token)) {
         const collection = await db.getAllBusinessRegistrations();
         return res.status(200).json({ error: null, data: { collection } });
       }
-      return res.status(403).json({ error: notAdminError.message, data: null });
-    }).catch(() => res.status(401).json({ error: invalidTokenError.message, data: null }));
+      return res.status(403).json({ error: errors.notAdmin.message, data: null });
+    }).catch(() => res.status(401).json({ error: errors.invalidToken.message, data: null }));
   });
 
   // View business signup (for admins)

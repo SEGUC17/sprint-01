@@ -1,7 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import http from 'http';
-import jwt from 'jsonwebtoken';
 import Database from './persistence/db';
 import api from './routes/api';
 import config from './config/main.json';
@@ -12,7 +11,7 @@ app.server = http.createServer(app);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const db = new Database(config.database);
+const db = new Database();
 
 db.connect()
   .then(() => {
@@ -20,7 +19,7 @@ db.connect()
   })
   .then(() => {
     app.use('/', express.static('public'));
-    app.use('/api/', api({ db, jwt, config: config.jwt }));
+    app.use('/api/', api({ db }));
 
     app.server.listen(process.env.PORT || config.server.port);
     console.log(`Server listening on port ${app.server.address().port}...`);

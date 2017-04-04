@@ -6,7 +6,7 @@
 		"uri": "mongodb://localhost:27017/test-db",
 		"reseed": true
 	},
-	"jwt": {
+	"auth": {
 		"header": "x-auth-token",
 		"secret": "F5bBnXPObTA3b1Ys7z0CdvGvCaIE82hLBNktmz7T"
 	}
