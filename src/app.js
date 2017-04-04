@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import http from 'http';
 import Database from './persistence/db';
 import api from './routes/api';
-import config from './config/main.json';
+import config from './config/main';
 
 const app = express();
 app.server = http.createServer(app);

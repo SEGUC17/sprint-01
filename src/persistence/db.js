@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb';
-import config from '../config/main.json';
+import config from '../config/main';
 
 export default class Database {
   /** Construction, Connection & Destruction */

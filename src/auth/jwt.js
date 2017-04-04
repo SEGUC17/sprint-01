@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import config from '../config/main.json';
+import config from '../config/main';
 import errors from '../validation/errors';
 
 export default {
