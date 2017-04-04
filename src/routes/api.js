@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import authenticationController from '../controllers/authentication';
-import businessesController from '../controllers/businesses';
-import activitiesController from '../controllers/activities';
-import activityBookingsController from '../controllers/activityBookings';
-import activityTypesController from '../controllers/activityTypes';
+import authenticationController from './controllers/authentication';
+import businessesController from './controllers/businesses';
+import activitiesController from './controllers/activities';
+import activityBookingsController from './controllers/activityBookings';
+import activityTypesController from './controllers/activityTypes';
 
 export default ({ db }) => {
   const api = Router();

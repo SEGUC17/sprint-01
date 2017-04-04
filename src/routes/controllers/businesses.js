@@ -1,5 +1,5 @@
-import jwt from '../auth/jwt';
-import errors from '../validation/errors';
+import jwt from '../../auth/jwt';
+import errors from '../../validation/errors';
 
 export default ({ api, db }) => {
   // List all businesses (for businesses, clients & admins)
