@@ -10,16 +10,17 @@
   "author": "SE 2017 Team",
   "license": "ISC",
   "dependencies": {
-    "nodemon": "^1.11.0",
-    "body-parser": "^1.17.0",
-    "express": "^4.15.0",
-    "mongodb": "^2.2.24",
-    "jsonwebtoken": "7.3.0",
-    "lodash": "4.17.4",
     "babel-cli": "6.18.0",
     "babel-preset-es2015": "6.18.0",
     "babel-preset-stage-2": "6.18.0",
-    "babel-register": "6.18.0"
+    "babel-register": "6.18.0",
+    "body-parser": "^1.17.0",
+    "express": "^4.15.0",
+    "jsonwebtoken": "7.3.0",
+    "lodash": "4.17.4",
+    "mongodb": "^2.2.24",
+    "mongoose": "^4.9.3",
+    "nodemon": "^1.11.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
