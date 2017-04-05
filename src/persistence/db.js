@@ -1,11 +1,12 @@
 import { MongoClient } from 'mongodb';
+import config from '../config/main';
 
 export default class Database {
   /** Construction, Connection & Destruction */
 
-  constructor(config) {
+  constructor() {
     this.db = {};
-    this.config = config;
+    this.config = config.database;
     return this;
   }
 
