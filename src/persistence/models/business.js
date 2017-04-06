@@ -35,7 +35,7 @@ const BusinessSchema = mongoose.Schema({
     },
   }),
 
-  mapLocation: mongoose.Schema({
+  location: mongoose.Schema({
     longitude: {
       type: String,
       required: true,
@@ -46,14 +46,14 @@ const BusinessSchema = mongoose.Schema({
     },
   }),
   
-  hours: mongoose.Schema({
-    opening: {
+  openingHours: mongoose.Schema({
+    from: {
       type: number,
       required: true,
       min: 0,
       max: 23
     },
-    closing: {
+    to: {
       type: String,
       required: true,
       min: 0,

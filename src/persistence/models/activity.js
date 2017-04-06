@@ -15,12 +15,12 @@ const ActivitySchema = mongoose.Schema({
     type: String,
   },
 
-  media: mongoose.Schema({
+  media: [mongoose.Schema({
     gallery: {
       type: mongoose.Schema.Types.ObjectId,
       ref : 'Image'
     },
-  }),
+  })],
   /**
    * @NOTE prices are stored in per minute in egyption pounds.
    */

@@ -18,7 +18,7 @@ const UserSchema = mongoose.Schema({
     },
   }),
 
-  mobileNumer: {
+  mobileNumber: {
     type: Date,
   },
   
