@@ -1,13 +1,10 @@
 import mongoose from 'mongoose';
 
 const ActivitySchema = mongoose.Schema({
-  createdAt: {
-    type: Date,
-    required: true,
-  },
 
   name: {
     type: String,
+    unique: true,
     required: true,
   },
 
@@ -41,11 +38,7 @@ const ActivitySchema = mongoose.Schema({
     ref: 'ActivityType'
   },
 
-  bookings : mongoose.Schema({
-    _id: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true
-    },
+  bookings : [mongoose.Schema({
     client: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -58,10 +51,11 @@ const ActivitySchema = mongoose.Schema({
     },
     isConfirmed: {
       type: Boolean,
-      required: true
+      required: true,
+      default: false
     },
 
-  })
+  })]
 
 });
 

@@ -26,9 +26,9 @@ export default ({ api, db }) => {
       .then((token) => {
         if (jwt.isBusiness(token)) {
 
-          return new Activity(req.body).save()
-          .then((Activity)=>{
-            return res.status(200).json({ error: null, data: Activity}) 
+          new Activity(req.body).save()
+          .then((activity)=>{
+            return res.status(200).json({ error: null, data: activity}) 
           })
           .catch((error) =>{
             res.status(401).json({ error: error, data: null });
