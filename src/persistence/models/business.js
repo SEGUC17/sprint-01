@@ -77,4 +77,7 @@ const BusinessSchema = mongoose.Schema({
   }),
 });
 
-export default mongoose.model('Business', BusinessSchema);
+var Business = mongoose.model('Business', BusinessSchema);
+
+module.exports = Business;
+//export default mongoose.model('Business', BusinessSchema);
