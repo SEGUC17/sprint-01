@@ -102,16 +102,17 @@ export default class Database {
         });
     }
 
-    modifyOneBusiness(
-        _id
-    , edits) {
+    modifyOneBusiness({_id}, edits) {
         return new Promise((resolve, reject) => {
-            Business.findByIdAndUpdate(_id, edits, (err, data) => {
+            Business.collection.findAndModify({
+                _id
+            }, [], {
+                $set: edits
+            }, {
+                new: true
+            }, (err, data) => {
                 if (err) reject(err);
-                console.log(edits);
-                console.log("============");
-                console.log(data);
-                resolve(data);
+                resolve(data.value);
             });
         });
     }
