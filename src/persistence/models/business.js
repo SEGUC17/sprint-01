@@ -45,10 +45,10 @@ const BusinessSchema = mongoose.Schema({
       required: true,
     },
   }),
-  
+
   openingHours: mongoose.Schema({
     from: {
-      type: number,
+      type: Number,
       required: true,
       min: 0,
       max: 23
@@ -77,4 +77,4 @@ const BusinessSchema = mongoose.Schema({
   }),
 });
 
-export default mongoose.model('Business', businessesSchema);
+export default mongoose.model('Business', BusinessSchema);
