@@ -5,7 +5,9 @@ import errors from '../../validation/errors';
 export default ({ api, db }) => {
   // Signup (for businesses & clients)
   api.post('/signup', (req, res) => {
-    res.json({});
+    //@TEMP : to be able to test
+    const token = jwt.sign({ username: req.body.userName, role: req.body.role });
+    res.json({token});
   });
 
   // Login (for businesses, clients & admins)

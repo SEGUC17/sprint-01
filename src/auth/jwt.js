@@ -4,7 +4,7 @@ import errors from '../validation/errors';
 
 export default {
   sign: ({ username, role }) =>
-    jwt.sign({ username, role }, config.secret),
+    jwt.sign({ username, role }, config.auth.secret),
 
   verify: req => new Promise((resolve, reject) => {
     const token = req.headers[config.auth.header];

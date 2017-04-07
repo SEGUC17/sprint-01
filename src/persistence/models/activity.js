@@ -53,7 +53,8 @@ const ActivitySchema = mongoose.Schema({
     },
     createdAt: {
       type: Date,
-      required: true
+      required: true,
+      default: Date.now
     },
     isConfirmed: {
       type: Boolean,
@@ -62,7 +63,11 @@ const ActivitySchema = mongoose.Schema({
 
   })
 
+});
 
+ActivitySchema.pre('save', function(next){
+  this.activityType = new mongoose.Schema.Types.ObjectId(this.activityType);
+  next();
 });
 
 export default mongoose.model('Activity', ActivitySchema);
