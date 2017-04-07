@@ -1,7 +1,13 @@
+import jwt from '../../auth/jwt';
+import errors from '../../validation/errors';
+
+import Activity from '../../persistence/models/activity';
+
+
 export default ({ api, db }) => {
   // List all activities (for businesses, clients & admins)
   api.get('/activities', (req, res) => {
-    res.json({});
+      res.json({});
   });
 
   // Search activities (for businesses, clients & admins)
@@ -16,7 +22,23 @@ export default ({ api, db }) => {
 
   // Create new activity (for businesses)
   api.post('/activities', (req, res) => {
-    res.json({});
+    jwt.verify(req)
+      .then((token) => {
+        if (jwt.isBusiness(token)) {
+
+          return new Activity(req.body).save()
+          .then((Activity)=>{
+            return res.status(200).json({ error: null, data: Activity}) 
+          })
+          .catch((error) =>{
+            res.status(401).json({ error: error, data: null });
+          })
+          
+        }
+        else
+          return res.status(403).json({ error: errors.notAdmin.message, data: null });
+      })
+      .catch(() => res.status(401).json({ error: errors.invalidToken.message, data: null }));
   });
 
   // Edit own activity (for businesses)
