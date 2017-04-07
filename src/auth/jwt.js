@@ -8,7 +8,6 @@ export default {
 
   verify: req => new Promise((resolve, reject) => {
     const token = req.headers[config.auth.header];
-    console.log(token, config.auth.secret);
     try {
       resolve(jwt.verify(token, config.auth.secret));
     } catch (err) {
