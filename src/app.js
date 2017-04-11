@@ -23,3 +23,5 @@ app.use('/api/', api({ db }));
 
 app.server.listen(process.env.PORT || config.server.port);
 console.log(`Server listening on port ${app.server.address().port}...`);
+
+module.exports = app;
