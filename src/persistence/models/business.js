@@ -10,6 +10,7 @@ const BusinessSchema = mongoose.Schema({
   owner:{
     type: mongoose.Schema.Types.ObjectId,
     required: true,
+    unique: true,
     ref: 'User'
   },
 
@@ -22,6 +23,7 @@ const BusinessSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
+    unique: true,
     trim: true
   },
 
@@ -49,7 +51,7 @@ const BusinessSchema = mongoose.Schema({
   
   openingHours: mongoose.Schema({
     from: {
-      type: number,
+      type: Number,
       required: true,
       min: 0,
       max: 23
@@ -78,4 +80,4 @@ const BusinessSchema = mongoose.Schema({
   }),
 });
 
-export default mongoose.model('Business', businessesSchema);
+export default mongoose.model('Business', BusinessSchema);

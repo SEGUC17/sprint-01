@@ -3,7 +3,7 @@ export default {
   notAuthorized: new Error('Not authorized'),
   
   notAdmin: new Error('Not admin'),
-  notBuissness: new Error('Not admin'),
+  notBusiness: new Error('Not Business'),
 
   userNotFound: new Error('User not found'),
   bookingNotFound: new Error('Booking not found'),

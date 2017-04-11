@@ -19,7 +19,7 @@ const ActivitySchema = mongoose.Schema({
     },
   })],
   /**
-   * @NOTE prices are stored in per minute in egyption pounds.
+   * @NOTE prices are stored per minute in egyption pounds.
    */
   prices: [mongoose.Schema({
     item: {

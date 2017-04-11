@@ -8,7 +8,7 @@ const UserSchema = mongoose.Schema({
     default: Date.now
   },
 
-  userName: {
+  username: {
     type: String,
     unique:true,
     required: true,
