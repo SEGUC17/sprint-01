@@ -7,21 +7,6 @@ const BusinessSchema = mongoose.Schema({
     default: Date.now(),
   },
 
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    unique: true,
-    ref: 'User',
-  },
-
-  activites: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: 'Activity',
-    },
-  ],
-
   name: {
     type: String,
     required: true,
@@ -32,13 +17,6 @@ const BusinessSchema = mongoose.Schema({
   description: {
     type: String,
   },
-
-  media: mongoose.Schema({
-    logo: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Image',
-    },
-  }),
 
   location: mongoose.Schema({
     longitude: {
@@ -68,6 +46,13 @@ const BusinessSchema = mongoose.Schema({
     },
   }),
 
+  media: mongoose.Schema({
+    logo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Image',
+    },
+  }),
+
   contactInfo: mongoose.Schema({
     telephones: {
       type: [String],
@@ -85,6 +70,21 @@ const BusinessSchema = mongoose.Schema({
       type: String,
     },
   }),
+
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    unique: true,
+    ref: 'User',
+  },
+
+  activites: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'Activity',
+    },
+  ],
 });
 
 export default mongoose.model('Business', BusinessSchema);
