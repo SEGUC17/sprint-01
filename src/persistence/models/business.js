@@ -17,7 +17,7 @@ const BusinessSchema = mongoose.Schema({
     type: String,
   },
 
-  location: mongoose.Schema({
+  location: {
     longitude: {
       type: Number,
       required: true,
@@ -27,9 +27,9 @@ const BusinessSchema = mongoose.Schema({
       type: Number,
       required: true,
     },
-  }),
+  },
 
-  openingHours: mongoose.Schema({
+  openingHours: {
     from: {
       type: Number,
       required: true,
@@ -43,16 +43,16 @@ const BusinessSchema = mongoose.Schema({
       min: 0,
       max: 23,
     },
-  }),
+  },
 
-  media: mongoose.Schema({
+  media: {
     logo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Image',
     },
-  }),
+  },
 
-  contactInfo: mongoose.Schema({
+  contactInfo: {
     telephones: {
       type: [String],
     },
@@ -68,7 +68,7 @@ const BusinessSchema = mongoose.Schema({
     twitter: {
       type: String,
     },
-  }),
+  },
 
   owner: {
     type: mongoose.Schema.Types.ObjectId,

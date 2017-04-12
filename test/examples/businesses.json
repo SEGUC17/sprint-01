@@ -4,19 +4,20 @@
     "name": "KFC",
     "description": "American fast food restaurant chain that specializes in fried chicken",
     "location": {
-      "longitude": "3.444",
-      "latitude": "4.555"
+      "longitude": 31.235712,
+      "latitude": 30.044420
     },
     "openingHours": {
       "from": 12,
       "to": 2
     },
     "media": {
-      "logo": null,
-      "gallery": null
+      "logo": null
     },
     "contactInfo": {
-      "telephone": 19019,
+      "telephones": [
+        "19019"
+      ],
       "website": "https://www.kfc.com/",
       "facebook": "https://www.facebook.com/kfc",
       "twitter": "https://twitter.com/kfc"
@@ -31,19 +32,20 @@
     "name": "McDonald's",
     "description": "American hamburger and fast food restaurant chain",
     "location": {
-      "longitude": "3.434",
-      "latitude": "4.55215"
+      "longitude": 31.235712,
+      "latitude": 30.044420
     },
     "openingHours": {
       "from": 8,
       "to": 22
     },
     "media": {
-      "logo": null,
-      "gallery": null
+      "logo": null
     },
     "contactInfo": {
-      "telephone": 19991,
+      "telephones": [
+        "19991"
+      ],
       "website": "https://www.mcdonalds.com/",
       "facebook": "https://www.facebook.com/mcdonalds/",
       "twitter": "https://twitter.com/mcdonalds"
