@@ -3,8 +3,7 @@ import mongoose from 'mongoose';
 const BusinessSchema = mongoose.Schema({
   createdAt: {
     type: Date,
-    required: true,
-    default: Date.now(),
+    default: Date.now,
   },
 
   name: {
@@ -20,12 +19,12 @@ const BusinessSchema = mongoose.Schema({
 
   location: mongoose.Schema({
     longitude: {
-      type: String,
+      type: Number,
       required: true,
     },
 
     latitude: {
-      type: String,
+      type: Number,
       required: true,
     },
   }),
@@ -39,7 +38,7 @@ const BusinessSchema = mongoose.Schema({
     },
 
     to: {
-      type: String,
+      type: Number,
       required: true,
       min: 0,
       max: 23,
@@ -74,7 +73,6 @@ const BusinessSchema = mongoose.Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    unique: true,
     ref: 'User',
   },
 
