@@ -57,7 +57,6 @@ const seed = (done) => {
 
     testData.activityDoc = { 
       name: 'testActivity',
-      email: 'tester@test.test',
       isConfirmed: "true",
     }
     
