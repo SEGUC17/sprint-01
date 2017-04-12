@@ -1,63 +1,61 @@
 import mongoose from 'mongoose';
-var bcrypt = require('bcrypt-nodejs');
+import bcrypt from 'bcrypt-nodejs';
 
 const UserSchema = mongoose.Schema({
   createdAt: {
     type: Date,
     required: true,
-    default: Date.now
+    default: Date.now(),
   },
 
   username: {
     type: String,
-    unique:true,
+    unique: true,
     required: true,
   },
 
   name: mongoose.Schema({
     first: {
       type: String,
-      required: true
+      required: true,
     },
+
     last: {
       type: String,
-      required: true
+      required: true,
     },
   }),
 
   mobileNumber: {
     type: Date,
   },
-  
+
   email: {
     type: String,
     required: true,
   },
 
-
   media: mongoose.Schema({
     profile: {
       type: mongoose.Schema.Types.ObjectId,
-      ref : 'Image'
+      ref: 'Image',
     },
   }),
 
-  role:{
-    type:String,
+  role: {
+    type: String,
     required: true,
-    enum: ['CLIENT','ADMIN','BUSINESS']
-  }
-  
+    enum: ['CLIENT', 'ADMIN', 'BUSINESS'],
+  },
 });
 
-// generating a hash
-UserSchema.methods.generateHash = function(password) {
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
-};
+// Generate a hash
+UserSchema.methods.generateHash = password =>
+  bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 
-// checking if password is valid
-UserSchema.methods.validPassword = function(password) {
-    return bcrypt.compareSync(password, this.local.password);
-};
+
+// Compare passwords
+UserSchema.methods.validPassword = password =>
+  bcrypt.compareSync(password, this.local.password);
 
 export default mongoose.model('User', UserSchema);

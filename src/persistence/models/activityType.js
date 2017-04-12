@@ -4,7 +4,7 @@ const ActivityTypeSchema = mongoose.Schema({
   createdAt: {
     type: Date,
     required: true,
-    default: Date.now
+    default: Date.now(),
   },
 
   name: {
@@ -17,11 +17,10 @@ const ActivityTypeSchema = mongoose.Schema({
   },
 
   isConfirmed: {
-    type:Boolean,
-    required:true,
-    default: false
-  }
-
+    type: Boolean,
+    required: true,
+    default: false,
+  },
 });
 
 export default mongoose.model('ActivityType', ActivityTypeSchema);

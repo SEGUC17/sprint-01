@@ -4,27 +4,29 @@ const BusinessSchema = mongoose.Schema({
   createdAt: {
     type: Date,
     required: true,
-    default: Date.now
+    default: Date.now(),
   },
 
-  owner:{
+  owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     unique: true,
-    ref: 'User'
+    ref: 'User',
   },
 
-  activites :[{
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: 'Activity'
-  }],
+  activites: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'Activity',
+    },
+  ],
 
   name: {
     type: String,
     required: true,
     unique: true,
-    trim: true
+    trim: true,
   },
 
   description: {
@@ -34,7 +36,7 @@ const BusinessSchema = mongoose.Schema({
   media: mongoose.Schema({
     logo: {
       type: mongoose.Schema.Types.ObjectId,
-      ref : 'Image'
+      ref: 'Image',
     },
   }),
 
@@ -43,6 +45,7 @@ const BusinessSchema = mongoose.Schema({
       type: String,
       required: true,
     },
+
     latitude: {
       type: String,
       required: true,
@@ -54,13 +57,14 @@ const BusinessSchema = mongoose.Schema({
       type: Number,
       required: true,
       min: 0,
-      max: 23
+      max: 23,
     },
+
     to: {
       type: String,
       required: true,
       min: 0,
-      max: 23
+      max: 23,
     },
   }),
 
@@ -68,12 +72,15 @@ const BusinessSchema = mongoose.Schema({
     telephones: {
       type: [String],
     },
+
     website: {
       type: String,
     },
+
     facebook: {
       type: String,
     },
+
     twitter: {
       type: String,
     },
