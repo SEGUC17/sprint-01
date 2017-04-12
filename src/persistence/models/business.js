@@ -4,11 +4,13 @@ const BusinessSchema = mongoose.Schema({
   createdAt: {
     type: Date,
     required: true,
+    default: Date.now
   },
 
   owner:{
     type: mongoose.Schema.Types.ObjectId,
     required: true,
+    unique: true,
     ref: 'User'
   },
 
@@ -21,6 +23,7 @@ const BusinessSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
+    unique: true,
     trim: true
   },
 
@@ -77,7 +80,4 @@ const BusinessSchema = mongoose.Schema({
   }),
 });
 
-var Business = mongoose.model('Business', BusinessSchema);
-
-module.exports = Business;
-//export default mongoose.model('Business', BusinessSchema);
+export default mongoose.model('Business', BusinessSchema);

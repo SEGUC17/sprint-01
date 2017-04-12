@@ -4,6 +4,9 @@ import http from 'http';
 import Database from './persistence/db';
 import api from './routes/api';
 import config from './config/main';
+import mongoose from 'mongoose';
+
+mongoose.Promise = Promise;
 
 const app = express();
 app.server = http.createServer(app);
@@ -13,17 +16,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const db = new Database();
 
-db.connect()
-  .then(() => {
-    if (config.database.reseed) db.drop();
-  })
-  .then(() => {
-    app.use('/', express.static('public'));
-    app.use('/api/', api({ db }));
+mongoose.connect(config.database.uri);
 
-    app.server.listen(process.env.PORT || config.server.port);
-    console.log(`Server listening on port ${app.server.address().port}...`);
-  })
-  .catch((err) => {
-    throw err;
-  });
+app.use('/', express.static('public'));
+app.use('/api/', api({ db }));
+
+app.server.listen(process.env.PORT || config.server.port);
+console.log(`Server listening on port ${app.server.address().port}...`);
+
+module.exports = app;

@@ -5,6 +5,13 @@ const UserSchema = mongoose.Schema({
   createdAt: {
     type: Date,
     required: true,
+    default: Date.now
+  },
+
+  username: {
+    type: String,
+    unique:true,
+    required: true,
   },
 
   name: mongoose.Schema({
@@ -38,7 +45,7 @@ const UserSchema = mongoose.Schema({
   role:{
     type:String,
     required: true,
-    enum: ['client','admin','business']
+    enum: ['CLIENT','ADMIN','BUSINESS']
   }
   
 });

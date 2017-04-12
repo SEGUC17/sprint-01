@@ -1,22 +1,66 @@
+import jwt from '../../auth/jwt';
+import errors from '../../validation/errors';
+
+import Activity from '../../persistence/models/activity';
+
+
 export default ({ api, db }) => {
   // List all activities (for businesses, clients & admins)
   api.get('/activities', (req, res) => {
-    res.json({});
+      Activity.find().exec()
+      .then((activities)=>{
+        return res.status(200).json({ error: null, data: activities});
+      })
+      .catch((error) =>{
+        res.status(500).json({ error: errors.internalServerError, data: null });
+      })
   });
 
   // Search activities (for businesses, clients & admins)
   api.get('/activities/search', (req, res) => {
-    res.json({});
+      let searchWord = req.query.name; 
+      Activity.find({ $regex: /searchWord/, $options: 'i' }).exec()
+      .then((activities)=>{
+        return res.status(200).json({ error: null, data: activities});
+      })
+      .catch((error) =>{
+        res.status(500).json({ error: errors.internalServerError, data: null });
+      })
   });
 
   // View activity (for businesses, clients & admins)
   api.get('/activities/:id', (req, res) => {
-    res.json({});
+    
+    let activityId = ObjectId(req.params.id);
+    Activity.findById(activityId).exec()
+    .then((activity)=>{
+      return res.status(200).json({ error: null, data: activity}) 
+    })
+    .catch((error) =>{
+      res.status(401).json({ error: errors.activityNotFound.message, data: null });
+    });
+
   });
 
   // Create new activity (for businesses)
   api.post('/activities', (req, res) => {
-    res.json({});
+    jwt.verify(req)
+      .then((token) => {
+        if (jwt.isBusiness(token)) {
+
+          new Activity(req.body).save()
+          .then((activity)=>{
+            return res.status(201).json({ error: null, data: activity}) 
+          })
+          .catch((error) =>{
+            res.status(401).json({ error: error, data: null });
+          })
+          
+        }
+        else
+          return res.status(403).json({ error: errors.notAdmin.message, data: null });
+      })
+      .catch(() => res.status(401).json({ error: errors.invalidToken.message, data: null }));
   });
 
   // Edit own activity (for businesses)

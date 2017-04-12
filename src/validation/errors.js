@@ -1,5 +1,15 @@
 export default {
   invalidToken: new Error('Invalid token'),
-  userNotFound: new Error('User not found'),
+  notAuthorized: new Error('Not authorized'),
+  
   notAdmin: new Error('Not admin'),
+  notBusiness: new Error('Not Business'),
+
+  userNotFound: new Error('User not found'),
+  bookingNotFound: new Error('Booking not found'),
+  activityNotFound: new Error('Activity not found'),
+
+  
+  internalServerError: new Error('Internal Server Error'),
+  
 };

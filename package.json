@@ -5,7 +5,7 @@
   "main": "src/app.js",
   "scripts": {
     "start": "nodemon src/app.js --exec babel-node",
-    "test": "mocha --compilers js:babel-core/register test/tests.js"
+    "test": "mocha --timeout 15000 --compilers js:babel-core/register test/ActivityBookingTests.js"
   },
   "author": "SE 2017 Team",
   "license": "ISC",
@@ -16,6 +16,7 @@
     "babel-register": "6.18.0",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.17.0",
+    "chai-http": "^3.0.0",
     "express": "^4.15.0",
     "jsonwebtoken": "7.3.0",
     "lodash": "4.17.4",
