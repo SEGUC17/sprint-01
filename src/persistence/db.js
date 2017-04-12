@@ -34,7 +34,7 @@ export default class Database {
   }
 
   getAllBusinesses() {
-    return Business.find().exec();
+    return Business.find().populate('owner').exec();
   }
 
   getBusinessById(_id) {

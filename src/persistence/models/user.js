@@ -4,8 +4,7 @@ import bcrypt from 'bcrypt-nodejs';
 const UserSchema = mongoose.Schema({
   createdAt: {
     type: Date,
-    required: true,
-    default: Date.now(),
+    default: Date.now,
   },
 
   username: {
@@ -26,7 +25,7 @@ const UserSchema = mongoose.Schema({
     },
   }),
 
-  mobileNumber: {
+  mobile: {
     type: Date,
   },
 
@@ -35,12 +34,12 @@ const UserSchema = mongoose.Schema({
     required: true,
   },
 
-  media: mongoose.Schema({
+  media: {
     profile: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Image',
     },
-  }),
+  },
 
   role: {
     type: String,
