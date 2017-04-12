@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 
-const ActivityTypeSchema = mongoose.Schema({
+const activityTypeSchema = mongoose.Schema({
   createdAt: {
     type: Date,
     required: true,
-    default: Date.now(),
+    default: Date.now,
   },
 
   name: {
@@ -23,4 +23,4 @@ const ActivityTypeSchema = mongoose.Schema({
   },
 });
 
-export default mongoose.model('ActivityType', ActivityTypeSchema);
+export default mongoose.model('ActivityType', activityTypeSchema);

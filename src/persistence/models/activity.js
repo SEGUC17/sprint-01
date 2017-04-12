@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const ActivitySchema = mongoose.Schema({
+const activitySchema = mongoose.Schema({
   name: {
     type: String,
     unique: true,
@@ -12,18 +12,19 @@ const ActivitySchema = mongoose.Schema({
   },
 
   media: [
-    mongoose.Schema({
+    {
       gallery: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Image',
       },
-    }),
+    },
   ],
+
   /**
    * @NOTE prices are stored per minute in egyption pounds.
    */
   prices: [
-    mongoose.Schema({
+    {
       item: {
         type: String,
         required: true,
@@ -32,7 +33,7 @@ const ActivitySchema = mongoose.Schema({
         type: Number,
         required: true,
       },
-    }),
+    },
   ],
 
   activityType: {
@@ -43,16 +44,18 @@ const ActivitySchema = mongoose.Schema({
 
   bookings: [
     mongoose.Schema({
-      client: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-      },
       createdAt: {
         type: Date,
         required: true,
         default: Date.now,
       },
+
+      client: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+      },
+
       isConfirmed: {
         type: Boolean,
         required: true,
@@ -62,9 +65,9 @@ const ActivitySchema = mongoose.Schema({
   ],
 });
 
-ActivitySchema.pre('save', (next) => {
+activitySchema.pre('save', (next) => {
   this.activityType = new mongoose.Schema.Types.ObjectId(this.activityType);
   next();
 });
 
-export default mongoose.model('Activity', ActivitySchema);
+export default mongoose.model('Activity', activitySchema);

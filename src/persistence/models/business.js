@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const BusinessSchema = mongoose.Schema({
+const businessSchema = mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
@@ -85,4 +85,4 @@ const BusinessSchema = mongoose.Schema({
   ],
 });
 
-export default mongoose.model('Business', BusinessSchema);
+export default mongoose.model('Business', businessSchema);

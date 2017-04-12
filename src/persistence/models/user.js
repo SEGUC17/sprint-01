@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt-nodejs';
 
-const UserSchema = mongoose.Schema({
+const userSchema = mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
@@ -49,12 +49,12 @@ const UserSchema = mongoose.Schema({
 });
 
 // Generate a hash
-UserSchema.methods.generateHash = password =>
+userSchema.methods.generateHash = password =>
   bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 
 
 // Compare passwords
-UserSchema.methods.validPassword = password =>
+userSchema.methods.validPassword = password =>
   bcrypt.compareSync(password, this.local.password);
 
-export default mongoose.model('User', UserSchema);
+export default mongoose.model('User', userSchema);
