@@ -2,7 +2,12 @@ import jwt from '../../auth/jwt';
 import errors from '../../validation/errors';
 
 import Activity from '../../persistence/models/activity';
+import User from '../../persistence/models/user';
+import ActivityType from '../../persistence/models/activityType';
+import Business from '../../persistence/models/business';
 
+import mongoose from 'mongoose';
+let ObjectId = mongoose.Types.ObjectId;
 
 export default ({ api, db }) => {
   // List all activities (for businesses, clients & admins)
@@ -19,6 +24,7 @@ export default ({ api, db }) => {
   // Search activities (for businesses, clients & admins)
   api.get('/activities/search', (req, res) => {
       let searchWord = req.query.name; 
+      // Activity.find({name: { $regex: new RegExp(searchWord, 'i') } }).exec()
       Activity.find({ $regex: /searchWord/, $options: 'i' }).exec()
       .then((activities)=>{
         return res.status(200).json({ error: null, data: activities});
@@ -37,7 +43,11 @@ export default ({ api, db }) => {
       return res.status(200).json({ error: null, data: activity}) 
     })
     .catch((error) =>{
+<<<<<<< HEAD
+      res.status(500).json({ error: errors.internalServerError.message, data: null });
+=======
       res.status(401).json({ error: errors.activityNotFound.message, data: null });
+>>>>>>> 36bb3f044b221b5eeae0dfdfa825d3e7e4678825
     });
 
   });
@@ -47,6 +57,41 @@ export default ({ api, db }) => {
     jwt.verify(req)
       .then((token) => {
         if (jwt.isBusiness(token)) {
+<<<<<<< HEAD
+          //TODO handle adding images 
+          //Todo check activityType exists or not confiirmed (Done)
+          //add activity to businesses if it succeeds .. back track if it wasn't(Done)
+
+          ActivityType.findOne({_id:req.body.ActivityType, isConfirmed:true}).exec()
+          .then(()=>{
+
+            new Activity(req.body).save()
+            .then((activity)=>{
+              
+              User.findOne({username: token.username}).exec()
+                .then((user) =>{
+                  
+                  Business.update({'owner': user._id}, {$push: {'activites': activity._id}})
+                    .then(()=>res.status(201).json({ error: null, data: activity}) )
+                    .catch((err) =>{
+                      Activity.remove({_id:activity.ObjectId})
+                        .then(()=>res.status(401).json({ error: error, data: null }))
+                    })
+
+                })
+                .catch((err)=> res.status(403).json({ error: errors.userNotFound.message, data: null }))
+
+
+            })
+            .catch((error) => res.status(401).json({ error: error, data: null }))
+
+          })
+          .catch((error)=> res.status(401).json({ error: errors.activityTypeNotFound.message, data: null }))
+            
+        }
+        else
+          return res.status(403).json({ error: errors.notBusiness.message, data: null });
+=======
 
           new Activity(req.body).save()
           .then((activity)=>{
@@ -59,6 +104,7 @@ export default ({ api, db }) => {
         }
         else
           return res.status(403).json({ error: errors.notAdmin.message, data: null });
+>>>>>>> 36bb3f044b221b5eeae0dfdfa825d3e7e4678825
       })
       .catch(() => res.status(401).json({ error: errors.invalidToken.message, data: null }));
   });

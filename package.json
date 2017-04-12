@@ -5,7 +5,7 @@
   "main": "src/app.js",
   "scripts": {
     "start": "nodemon src/app.js --exec babel-node",
-    "test": "mocha --timeout 15000 --compilers js:babel-core/register test/ActivityBookingTests.js"
+    "test": "mocha --timeout 15000 --compilers js:babel-core/register test/ActivityTests.js"
   },
   "author": "SE 2017 Team",
   "license": "ISC",

@@ -8,6 +8,7 @@ export default {
   userNotFound: new Error('User not found'),
   bookingNotFound: new Error('Booking not found'),
   activityNotFound: new Error('Activity not found'),
+  activityTypeNotFound: new Error('Activity type not found'),
 
   
   internalServerError: new Error('Internal Server Error'),

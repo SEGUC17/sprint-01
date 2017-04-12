@@ -5,7 +5,6 @@ const ActivityTypeSchema = mongoose.Schema({
     type: Date,
     required: true,
     default: Date.now
-    
   },
 
   name: {
