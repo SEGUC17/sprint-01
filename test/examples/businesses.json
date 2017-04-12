@@ -2,13 +2,19 @@
   {
     "name": "KFC",
     "description": "American fast food restaurant chain that specializes in fried chicken",
-    "location": "https://goo.gl/maps/VkT8Esek9Wp",
+    "createdAt":"Fri Apr 07 2017 16:54:19 GMT+0300 (AST)",
+    "owner": "507f1f77bcf86cd799439011",
+    "activites": "507f1f77bcf86cd799439011",
+    "location":{
+      "longitude": "3.444",
+      "latitude": "4.555"
+    },
     "openingHours": {
       "from": 12,
       "to": 2
     },
     "media": {
-      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/b/bf/KFC_logo.svg/1024px-KFC_logo.svg.png",
+      "logo": null,
       "gallery": null
     },
     "contactInfo": {
@@ -21,13 +27,19 @@
   {
     "name": "McDonald's",
     "description": "American hamburger and fast food restaurant chain",
-    "location": "https://goo.gl/maps/VkT8Esek9Wp",
+    "createdAt":"Fri Apr 07 2017 16:54:19 GMT+0300 (AST)",
+    "owner": "507f1f77bcf86cd799439011",
+    "activites": "507f1f77bcf86cd799439011",
+    "location":{
+      "longitude": "3.434",
+      "latitude": "4.55215"
+    },
     "openingHours": {
       "from": 8,
       "to": 22
     },
     "media": {
-      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png",
+      "logo": null,
       "gallery": null
     },
     "contactInfo": {

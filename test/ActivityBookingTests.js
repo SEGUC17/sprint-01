@@ -27,7 +27,11 @@ chai.use(chaiHttp);
 let testData = {};
 
 
+<<<<<<< HEAD
 const seed = (done) => {
+=======
+const beforeEachHook = (done) => {
+>>>>>>> 36bb3f044b221b5eeae0dfdfa825d3e7e4678825
   mongoose.connection.dropDatabase(error => {
     if(error){
       console.log('Error', error);
@@ -57,6 +61,10 @@ const seed = (done) => {
 
     testData.activityDoc = { 
       name: 'testActivity',
+<<<<<<< HEAD
+=======
+      email: 'tester@test.test',
+>>>>>>> 36bb3f044b221b5eeae0dfdfa825d3e7e4678825
       isConfirmed: "true",
     }
     
@@ -95,7 +103,11 @@ const seed = (done) => {
   });
 }
 describe('ActivityBooking', () => {
+<<<<<<< HEAD
   before(seed); 
+=======
+  before(beforeEachHook); 
+>>>>>>> 36bb3f044b221b5eeae0dfdfa825d3e7e4678825
 
   describe('GET /activities/:id/bookings', () => {
     it('should return correct data', (done) =>{      
@@ -105,7 +117,11 @@ describe('ActivityBooking', () => {
 		    .end((err, res) => {
 			  	expect(res).to.have.status(200);
 			  	expect(res.body.error).to.be.null;
+<<<<<<< HEAD
 			  	expect(res.body.data).to.be.an('array');
+=======
+			  	expect(res.body.data).to.be.a('array');
+>>>>>>> 36bb3f044b221b5eeae0dfdfa825d3e7e4678825
 			  	expect(res.body.data).to.be.of.length(1);
 		      done();
       });

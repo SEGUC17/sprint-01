@@ -1,111 +1,133 @@
-import { MongoClient } from 'mongodb';
+import {
+    MongoClient
+} from 'mongodb';
+var mongoose = require('mongoose');
 import config from '../config/main';
 
+var Business = require('./models/business');
+
 export default class Database {
-  /** Construction, Connection & Destruction */
+    /** Construction, Connection & Destruction */
 
-  constructor() {
-    this.db = {};
-    this.config = config.database;
-    return this;
-  }
+    constructor() {
+        this.db = {};
+        this.config = config.database;
+        mongoose.Promise = global.Promise;
+        return this;
+    }
 
-  connect() {
-    return new Promise((resolve, reject) => {
-      MongoClient
-        .connect(this.config.uri, (err, db) => {
-          if (err) reject(err);
-          this.db = db;
-          resolve(this);
+    connect() {
+        return new Promise((resolve, reject) => {
+            mongoose.connect(this.config.uri).then(
+                () => {
+                    //  this.db = mongoose,connection.db;
+                    resolve(this);
+                },
+                err => {
+                    reject(err);
+                }
+            );
+        })
+    }
+
+
+    drop() {
+        mongoose.connection.db.dropDatabase((err) => {
+            if (err) throw error;
         });
-    });
-  }
+    }
 
-  drop() {
-    this.db.dropDatabase();
-  }
+    /** Businesses */
 
-  /** Businesses */
+    insertOneBusiness(business) {
+        return new Promise((resolve, reject) => {
+            Business.collection.insert(business, (err, r) => {
+                if (err) reject(err);
+                resolve(r.ops[0]);
+            })
 
-  insertOneBusiness(business) {
-    return new Promise((resolve, reject) => {
-      this.db.collection('businesses')
-        .insertOne(business, ((err, data) => {
-          if (err) reject(err);
-          resolve(data.ops[0]);
-        }));
-    });
-  }
-
-  insertBusinesses(businesses) {
-    return new Promise((resolve, reject) => {
-      this.db.collection('businesses')
-        .insert(businesses, ((err, data) => {
-          if (err) reject(err);
-          resolve(data.ops);
-        }));
-    });
-  }
-
-  getAllBusinesses() {
-    return new Promise((resolve, reject) => {
-      this.db.collection('businesses')
-        .find({}).toArray((err, data) => {
-          if (err) reject(err);
-          resolve(data);
         });
-    });
-  }
+    }
 
-  getBusinessesCount() {
-    return new Promise((resolve, reject) => {
-      this.db.collection('businesses')
-        .find({}).count((err, data) => {
-          if (err) reject(err);
-          resolve(data);
+    insertBusinesses(businesses) {
+        return new Promise((resolve, reject) => {
+            Business.collection.insertMany(businesses, (err, r) => {
+                if (err) reject(err);
+                resolve(r.ops);
+            })
         });
-    });
-  }
+    }
 
-  searchBusinesses(query) {
-    return new Promise((resolve, reject) => {
-      this.db.collection('businesses')
-        .find(query).toArray((err, data) => {
-          if (err) reject(err);
-          resolve(data);
+    getAllBusinesses() {
+        return new Promise((resolve, reject) => {
+            Business.collection.find({}).toArray((err, data) => {
+                if (err) reject(err);
+                resolve(data);
+            });
         });
-    });
-  }
+    }
 
-  getOneBusiness({ _id }) {
-    return new Promise((resolve, reject) => {
-      this.db.collection('businesses')
-        .findOne({ _id }, (err, data) => {
-          if (err) reject(err);
-          resolve(data);
+    getBusinessesCount() {
+        return new Promise((resolve, reject) => {
+            Business.count({}, (err, data) => {
+                if (err) reject(err);
+                resolve(data);
+            });
         });
-    });
-  }
+    }
 
-  modifyOneBusiness({ _id }, edits) {
-    return new Promise((resolve, reject) => {
-      this.db.collection('businesses')
-        .findAndModify({ _id }, [],
-        { $set: edits }, { new: true }, (err, data) => {
-          if (err) reject(err);
-          resolve(data.value);
+    searchBusinesses(query) {
+        return new Promise((resolve, reject) => {
+            Business.collection.find(
+                query).toArray(
+                (err, data) => {
+                    if (err) reject(err);
+                    resolve(data);
+                });
         });
-    });
-  }
+    }
 
-  deleteOneBusiness({ _id }) {
-    return new Promise((resolve, reject) => {
-      this.db.collection('businesses')
-        .findAndModify({ _id }, [],
-        {}, { remove: true }, (err, data) => {
-          if (err) reject(err);
-          resolve(data.value);
+    getOneBusiness({
+        _id
+    }) {
+        return new Promise((resolve, reject) => {
+            Business.collection.findOne({
+                _id
+            }, (err, data) => {
+                if (err) reject(err);
+                //  console.log(data);
+                resolve(data);
+
+            });
         });
-    });
-  }
+    }
+
+    modifyOneBusiness({_id}, edits) {
+        return new Promise((resolve, reject) => {
+            Business.collection.findAndModify({
+                _id
+            }, [], {
+                $set: edits
+            }, {
+                new: true
+            }, (err, data) => {
+                if (err) reject(err);
+                resolve(data.value);
+            });
+        });
+    }
+
+    deleteOneBusiness({
+        _id
+    }) {
+        return new Promise((resolve, reject) => {
+            var record = this.getOneBusiness({
+                _id
+            })
+            Business.findByIdAndRemove(_id, (err) => {
+                if (err) reject(err);
+                resolve(record);
+            });
+        });
+    }
 }

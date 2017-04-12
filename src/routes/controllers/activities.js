@@ -9,7 +9,6 @@ import Business from '../../persistence/models/business';
 import mongoose from 'mongoose';
 let ObjectId = mongoose.Types.ObjectId;
 
-
 export default ({ api, db }) => {
   // List all activities (for businesses, clients & admins)
   api.get('/activities', (req, res) => {
@@ -25,7 +24,8 @@ export default ({ api, db }) => {
   // Search activities (for businesses, clients & admins)
   api.get('/activities/search', (req, res) => {
       let searchWord = req.query.name; 
-      Activity.find({name: { $regex: new RegExp(searchWord, 'i') } }).exec()
+      // Activity.find({name: { $regex: new RegExp(searchWord, 'i') } }).exec()
+      Activity.find({ $regex: /searchWord/, $options: 'i' }).exec()
       .then((activities)=>{
         return res.status(200).json({ error: null, data: activities});
       })
@@ -43,7 +43,11 @@ export default ({ api, db }) => {
       return res.status(200).json({ error: null, data: activity}) 
     })
     .catch((error) =>{
+<<<<<<< HEAD
       res.status(500).json({ error: errors.internalServerError.message, data: null });
+=======
+      res.status(401).json({ error: errors.activityNotFound.message, data: null });
+>>>>>>> 36bb3f044b221b5eeae0dfdfa825d3e7e4678825
     });
 
   });
@@ -53,6 +57,7 @@ export default ({ api, db }) => {
     jwt.verify(req)
       .then((token) => {
         if (jwt.isBusiness(token)) {
+<<<<<<< HEAD
           //TODO handle adding images 
           //Todo check activityType exists or not confiirmed (Done)
           //add activity to businesses if it succeeds .. back track if it wasn't(Done)
@@ -86,6 +91,20 @@ export default ({ api, db }) => {
         }
         else
           return res.status(403).json({ error: errors.notBusiness.message, data: null });
+=======
+
+          new Activity(req.body).save()
+          .then((activity)=>{
+            return res.status(201).json({ error: null, data: activity}) 
+          })
+          .catch((error) =>{
+            res.status(401).json({ error: error, data: null });
+          })
+          
+        }
+        else
+          return res.status(403).json({ error: errors.notAdmin.message, data: null });
+>>>>>>> 36bb3f044b221b5eeae0dfdfa825d3e7e4678825
       })
       .catch(() => res.status(401).json({ error: errors.invalidToken.message, data: null }));
   });

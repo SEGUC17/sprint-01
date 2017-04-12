@@ -48,7 +48,7 @@ const BusinessSchema = mongoose.Schema({
       required: true,
     },
   }),
-  
+
   openingHours: mongoose.Schema({
     from: {
       type: Number,
