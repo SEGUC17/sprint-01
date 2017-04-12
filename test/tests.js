@@ -9,31 +9,22 @@ const expect = chai.expect;
 chai.use(chaiAsPromised);
 
 const db = new Database(config.database);
+
+const beforeHook = () => db.connect();
 const beforeEachHook = () => db.drop();
 
 describe('Database', () => {
-  /** Initialization */
-
-  describe('Initialization', () => {
-    it('should connect', () =>
-      expect(db.connect())
-        .to.eventually.not.be.empty);
-  });
+  before(beforeHook);
 
   /** Businesses */
 
-  describe('Businesses', () => {
+  describe('Businesses', async () => {
     beforeEach(beforeEachHook);
 
     it('should insert one business', () =>
       Promise.resolve()
         .then(() => expect(db.insertOneBusiness(businesses[0]))
           .to.eventually.deep.equal(businesses[0])));
-
-    it('should insert all businesses', () =>
-      Promise.resolve()
-        .then(() => expect(db.insertBusinesses(businesses))
-          .to.eventually.deep.equal(businesses)));
 
     it('should get all businesses', () =>
       Promise.resolve()

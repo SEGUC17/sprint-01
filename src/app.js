@@ -1,7 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import http from 'http';
-import mongoose from 'mongoose';
 import Database from './persistence/db';
 import api from './routes/api';
 import config from './config/main';
@@ -13,13 +12,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const db = new Database();
-mongoose.Promise = Promise;
-mongoose.connect(config.database.uri);
 
-app.use('/', express.static('public'));
-app.use('/api/', api({ db }));
+db.connect()
+  .then(async () => {
+    if (config.database.reseed) db.drop();
+  })
+  .then(() => {
+    app.use('/', express.static('public'));
+    app.use('/api/', api({ db }));
 
-app.server.listen(process.env.PORT || config.server.port);
-console.log(`Server listening on port ${app.server.address().port}...`);
-
-export default app;
+    app.server.listen(process.env.PORT || config.server.port);
+    console.log(`Server listening on port ${app.server.address().port}...`);
+  })
+  .catch((err) => {
+    console.error(err.message);
+  });

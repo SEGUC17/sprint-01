@@ -22,7 +22,9 @@
       "twitter": "https://twitter.com/kfc"
     },
     "owner": "507f1f77bcf86cd799439011",
-    "activites": "507f1f77bcf86cd799439011"
+    "activites": [
+      "507f1f77bcf86cd799439011"
+    ]
   },
   {
     "createdAt": 1491990791934,
@@ -47,6 +49,8 @@
       "twitter": "https://twitter.com/mcdonalds"
     },
     "owner": "507f1f77bcf86cd799439011",
-    "activites": "507f1f77bcf86cd799439011"
+    "activites": [
+      "507f1f77bcf86cd799439011"
+    ]
   }
 ]
