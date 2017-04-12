@@ -1,6 +1,5 @@
 [
   {
-    "createdAt": 1491990791934,
     "name": "KFC",
     "description": "American fast food restaurant chain that specializes in fried chicken",
     "location": {
@@ -28,7 +27,6 @@
     ]
   },
   {
-    "createdAt": 1491990791934,
     "name": "McDonald's",
     "description": "American hamburger and fast food restaurant chain",
     "location": {
