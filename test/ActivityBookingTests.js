@@ -27,7 +27,7 @@ chai.use(chaiHttp);
 let testData = {};
 
 
-const beforeEachHook = (done) => {
+const seed = (done) => {
   mongoose.connection.dropDatabase(error => {
     if(error){
       console.log('Error', error);
@@ -96,7 +96,7 @@ const beforeEachHook = (done) => {
   });
 }
 describe('ActivityBooking', () => {
-  before(beforeEachHook); 
+  before(seed); 
 
   describe('GET /activities/:id/bookings', () => {
     it('should return correct data', (done) =>{      
@@ -106,7 +106,7 @@ describe('ActivityBooking', () => {
 		    .end((err, res) => {
 			  	expect(res).to.have.status(200);
 			  	expect(res.body.error).to.be.null;
-			  	expect(res.body.data).to.be.a('array');
+			  	expect(res.body.data).to.be.an('array');
 			  	expect(res.body.data).to.be.of.length(1);
 		      done();
       });

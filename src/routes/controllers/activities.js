@@ -3,6 +3,9 @@ import errors from '../../validation/errors';
 
 import Activity from '../../persistence/models/activity';
 
+import mongoose from 'mongoose';
+let ObjectId = mongoose.Types.ObjectId;
+
 
 export default ({ api, db }) => {
   // List all activities (for businesses, clients & admins)
@@ -19,7 +22,7 @@ export default ({ api, db }) => {
   // Search activities (for businesses, clients & admins)
   api.get('/activities/search', (req, res) => {
       let searchWord = req.query.name; 
-      Activity.find({ $regex: /searchWord/, $options: 'i' }).exec()
+      Activity.find({name: { $regex: new RegExp(searchWord, 'i') } }).exec()
       .then((activities)=>{
         return res.status(200).json({ error: null, data: activities});
       })
@@ -37,7 +40,7 @@ export default ({ api, db }) => {
       return res.status(200).json({ error: null, data: activity}) 
     })
     .catch((error) =>{
-      res.status(401).json({ error: errors.activityNotFound.message, data: null });
+      res.status(500).json({ error: errors.internalServerError.message, data: null });
     });
 
   });
