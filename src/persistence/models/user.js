@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt-nodejs';
+import roles from '../../constants/roles';
 
 const userSchema = mongoose.Schema({
   createdAt: {
@@ -44,7 +45,7 @@ const userSchema = mongoose.Schema({
   role: {
     type: String,
     required: true,
-    enum: ['CLIENT', 'ADMIN', 'BUSINESS'],
+    enum: [roles.CLIENT, roles.ADMIN, roles.OWNER],
   },
 });
 

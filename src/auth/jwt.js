@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import config from '../config/main';
-import errors from '../validation/errors';
+import errors from '../constants/errors';
+import roles from '../constants/roles';
 
 export default {
   sign: ({ username, role }) =>
@@ -17,16 +18,16 @@ export default {
 
   isAdmin: (token) => {
     const { role } = token;
-    return role === 'ADMIN';
+    return role === roles.ADMIN;
   },
 
-  isBusiness: (token) => {
+  isOwner: (token) => {
     const { role } = token;
-    return role === 'BUSINESS';
+    return role === roles.OWNER;
   },
 
   isClient: (token) => {
     const { role } = token;
-    return role === 'CLIENT';
+    return role === roles.CLIENT;
   },
 };
