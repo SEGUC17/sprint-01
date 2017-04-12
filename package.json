@@ -5,7 +5,7 @@
   "main": "src/app.js",
   "scripts": {
     "start": "nodemon src/app.js --exec babel-node",
-    "test": "mocha --timeout 15000 --compilers js:babel-core/register test/ActivityTests.js"
+    "test": "mocha --compilers js:babel-core/register --timeout 15000 test/tests.js"
   },
   "author": "SE 2017 Team",
   "license": "ISC",
@@ -16,17 +16,16 @@
     "babel-register": "6.18.0",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.17.0",
-    "chai-http": "^3.0.0",
     "express": "^4.15.0",
     "jsonwebtoken": "7.3.0",
     "lodash": "4.17.4",
-    "mongodb": "^2.2.24",
     "mongoose": "^4.9.3",
     "nodemon": "^1.11.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
+    "chai-http": "^3.0.0",
     "mocha": "^3.2.0",
     "eslint": "3.12.2",
     "eslint-config-airbnb-base": "11.0.0",
