@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 import config from '../config/main';
-import errors from '../constants/errors';
 import roles from '../constants/roles';
 
 export default {
@@ -9,25 +8,16 @@ export default {
 
   verify: req => new Promise((resolve, reject) => {
     const token = req.headers[config.auth.header];
-    try {
-      resolve(jwt.verify(token, config.auth.secret));
-    } catch (err) {
-      reject(errors.invalidToken);
-    }
+
+    jwt.verify(token, config.auth.secret, (err, decoded) => {
+      if (err) reject();
+      resolve(decoded);
+    });
   }),
 
-  isAdmin: (token) => {
-    const { role } = token;
-    return role === roles.ADMIN;
-  },
+  isAdmin: token => token.role === roles.ADMIN,
 
-  isOwner: (token) => {
-    const { role } = token;
-    return role === roles.OWNER;
-  },
+  isOwner: token => token.role === roles.OWNER,
 
-  isClient: (token) => {
-    const { role } = token;
-    return role === roles.CLIENT;
-  },
+  isClient: token => token.role === roles.CLIENT,
 };
