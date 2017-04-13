@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
-const ActivitySchema = mongoose.Schema({
-
+const activitySchema = mongoose.Schema({
   name: {
     type: String,
     unique: true,
@@ -12,56 +11,58 @@ const ActivitySchema = mongoose.Schema({
     type: String,
   },
 
-  media: [mongoose.Schema({
-    gallery: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref : 'Image'
+  media: [
+    {
+      gallery: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Image',
+      },
     },
-  })],
-  /**
-   * @NOTE prices are stored per minute in egyption pounds.
-   */
-  prices: [mongoose.Schema({
-    item: {
-      type: String,
-      required: true
-    },
-    price: {
-      type: Number,
-      required: true
-    },
-  })],
+  ],
 
-  activityType:{
+  /**
+   * @NOTE: Prices are stored per minute in egyption pounds
+   */
+  prices: [
+    {
+      item: {
+        type: String,
+        required: true,
+      },
+      price: {
+        type: Number,
+        required: true,
+      },
+    },
+  ],
+
+  activityType: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'ActivityType'
+    ref: 'ActivityType',
   },
 
-  bookings : [mongoose.Schema({
-    client: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
-    },
-    createdAt: {
-      type: Date,
-      required: true,
-      default: Date.now
-    },
-    isConfirmed: {
-      type: Boolean,
-      required: true,
-      default: false
-    },
+  bookings: [
+    mongoose.Schema({
+      createdAt: {
+        type: Date,
+        required: true,
+        default: Date.now,
+      },
 
-  })]
+      client: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+      },
 
+      isConfirmed: {
+        type: Boolean,
+        required: true,
+        default: false,
+      },
+    }),
+  ],
 });
 
-ActivitySchema.pre('save', function(next){
-  this.activityType = new mongoose.Schema.Types.ObjectId(this.activityType);
-  next();
-});
-
-export default mongoose.model('Activity', ActivitySchema);
+export default mongoose.model('Activity', activitySchema);

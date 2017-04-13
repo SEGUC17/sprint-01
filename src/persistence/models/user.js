@@ -1,63 +1,62 @@
 import mongoose from 'mongoose';
-var bcrypt = require('bcrypt-nodejs');
+import bcrypt from '../../auth/bcrypt';
 
-const UserSchema = mongoose.Schema({
+const userSchema = mongoose.Schema({
   createdAt: {
     type: Date,
-    required: true,
-    default: Date.now
+    default: Date.now,
+  },
+
+  isAdmin: {
+    type: Boolean,
+    default: false,
   },
 
   username: {
     type: String,
-    unique:true,
+    unique: true,
     required: true,
   },
 
-  name: mongoose.Schema({
+  password: {
+    type: String,
+    required: true,
+  },
+
+  name: {
     first: {
       type: String,
-      required: true
+      required: true,
     },
+
     last: {
       type: String,
-      required: true
+      required: true,
     },
-  }),
-
-  mobileNumber: {
-    type: Date,
   },
-  
+
+  mobile: {
+    type: String,
+    required: true,
+  },
+
   email: {
     type: String,
     required: true,
   },
 
-
-  media: mongoose.Schema({
-    profile: {
+  media: {
+    profilePicture: {
       type: mongoose.Schema.Types.ObjectId,
-      ref : 'Image'
+      ref: 'Image',
     },
-  }),
-
-  role:{
-    type:String,
-    required: true,
-    enum: ['CLIENT','ADMIN','BUSINESS']
-  }
-  
+  },
 });
 
-// generating a hash
-UserSchema.methods.generateHash = function(password) {
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
-};
+// eslint-disable-next-line prefer-arrow-callback, func-names
+userSchema.pre('save', function (next) {
+  this.password = bcrypt.hash(this.password);
+  next();
+});
 
-// checking if password is valid
-UserSchema.methods.validPassword = function(password) {
-    return bcrypt.compareSync(password, this.local.password);
-};
-
-export default mongoose.model('User', UserSchema);
+export default mongoose.model('User', userSchema);

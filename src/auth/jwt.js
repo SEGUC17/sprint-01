@@ -1,32 +1,26 @@
 import jwt from 'jsonwebtoken';
-import config from '../config/main';
-import errors from '../validation/errors';
+import config from '../constants/config';
 
 export default {
-  sign: ({ username, role }) =>
-    jwt.sign({ username, role }, config.auth.secret),
+  sign: ({ username, isAdmin }) =>
+    jwt.sign({ username, isAdmin }, config.auth.secret),
 
   verify: req => new Promise((resolve, reject) => {
     const token = req.headers[config.auth.header];
-    try {
-      resolve(jwt.verify(token, config.auth.secret));
-    } catch (err) {
-      reject(errors.invalidToken);
-    }
+
+    jwt.verify(token, config.auth.secret, (err, decoded) => {
+      if (err) reject();
+      resolve(decoded);
+    });
   }),
 
-  isAdmin: (token) => {
-    const { role } = token;
-    return role === 'ADMIN';
-  },
+  isAdmin: token => new Promise((resolve, reject) => {
+    if (token.isAdmin) return resolve(token);
+    return reject();
+  }),
 
-  isBusiness: (token) => {
-    const { role } = token;
-    return role === 'BUSINESS';
-  },
-
-  isClient: (token) => {
-    const { role } = token;
-    return role === 'CLIENT';
-  },
+  isClient: token => new Promise((resolve, reject) => {
+    if (!token.isAdmin) return resolve(token);
+    return reject();
+  }),
 };

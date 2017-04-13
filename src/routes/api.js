@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import authenticationController from './controllers/authentication';
 import businessesController from './controllers/businesses';
+import businessRegistrationsController from './controllers/businessRegistrations';
 import activitiesController from './controllers/activities';
 import activityBookingsController from './controllers/activityBookings';
 import activityTypesController from './controllers/activityTypes';
@@ -11,8 +12,11 @@ export default ({ db }) => {
   /** Signup & Login */
   authenticationController({ api, db });
 
-  /** Businesses & Business Registrations */
+  /** Businesses */
   businessesController({ api, db });
+
+  /** Business Registrations */
+  businessRegistrationsController({ api, db });
 
   /** Activities */
   activitiesController({ api, db });

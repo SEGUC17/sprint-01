@@ -1,83 +1,92 @@
 import mongoose from 'mongoose';
 
-const BusinessSchema = mongoose.Schema({
+const businessSchema = mongoose.Schema({
   createdAt: {
     type: Date,
-    required: true,
-    default: Date.now
+    default: Date.now,
   },
 
-  owner:{
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    unique: true,
-    ref: 'User'
+  isVerified: {
+    type: Boolean,
+    default: false,
   },
-
-  activites :[{
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: 'Activity'
-  }],
 
   name: {
     type: String,
     required: true,
     unique: true,
-    trim: true
   },
 
   description: {
     type: String,
   },
 
-  media: mongoose.Schema({
-    logo: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref : 'Image'
-    },
-  }),
-
-  location: mongoose.Schema({
+  location: {
     longitude: {
-      type: String,
+      type: Number,
       required: true,
     },
-    latitude: {
-      type: String,
-      required: true,
-    },
-  }),
 
-  openingHours: mongoose.Schema({
+    latitude: {
+      type: Number,
+      required: true,
+    },
+  },
+
+  openingHours: {
     from: {
       type: Number,
       required: true,
       min: 0,
-      max: 23
+      max: 23,
     },
+
     to: {
-      type: String,
+      type: Number,
       required: true,
       min: 0,
-      max: 23
+      max: 23,
     },
-  }),
+  },
 
-  contactInfo: mongoose.Schema({
+  media: {
+    logo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Image',
+    },
+  },
+
+  contactInfo: {
     telephones: {
       type: [String],
     },
+
     website: {
       type: String,
     },
+
     facebook: {
       type: String,
     },
+
     twitter: {
       type: String,
     },
-  }),
+  },
+
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'User',
+  },
+
+  activites: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'Activity',
+    },
+  ],
 });
 
-export default mongoose.model('Business', BusinessSchema);
+export default mongoose.model('Business', businessSchema);
