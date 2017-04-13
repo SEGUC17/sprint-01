@@ -2,6 +2,7 @@
   {
     "_id": "507f1f77bcf86cd799439011",
     "username": "john.doe",
+    "password": "123",
     "name": {
       "first": "John",
       "last": "Doe"

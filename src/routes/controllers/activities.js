@@ -45,12 +45,12 @@ export default ({ api, db }) => {
   });
 
   // Confirm own activity's booking request (for businesses)
-  api.put('/activities/:id/booking-requests/:id/confirm', (req, res) => {
+  api.put('/activities/:id/booking-requests/:id/verify', (req, res) => {
     res.json({});
   });
 
   // Discard own activity's booking request (for businesses)
-  api.delete('/activities/:id/booking-requests/:id/confirm', (req, res) => {
+  api.delete('/activities/:id/booking-requests/:id/verify', (req, res) => {
     res.json({});
   });
 };

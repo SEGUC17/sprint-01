@@ -22,34 +22,68 @@ export default class Database {
   /** Businesses */
 
   insertOneBusiness(business) {
-    return new Business(business).save();
+    return Business.create({ ...business, isVerified: true });
   }
 
   insertBusinesses(businesses) {
-    return Business.create(businesses);
+    return Business.create(businesses.map(business => ({ ...business, isVerified: true })));
   }
 
   getBusinessesCount() {
-    return Business.count().exec();
+    return Business.count({ isVerified: true }).exec();
   }
 
   getAllBusinesses() {
-    return Business.find().populate('owner').exec();
+    return Business.find({ isVerified: true }).populate('owner').exec();
   }
 
   getBusinessById(_id) {
-    return Business.findById(_id).exec();
+    return Business.findOne({ _id, isVerified: true }).exec();
   }
 
   searchBusinesses(query) {
-    return Business.find(query).exec();
+    return Business.find({ ...query, isVerified: true }).exec();
   }
 
   updateBusinessById(_id, updates) {
-    return Business.findByIdAndUpdate(_id, updates, { new: true }).exec();
+    return Business.findOneAndUpdate({ _id, isVerified: true }, updates, { new: true }).exec();
   }
 
   deleteBusinessById(_id) {
-    return Business.findByIdAndRemove(_id).exec();
+    return Business.findOneAndRemove({ _id, isVerified: true }).exec();
+  }
+
+  /** Business Registrations */
+
+  insertOneBusinessRegistration(business) {
+    return Business.create({ ...business, isVerified: false });
+  }
+
+  insertBusinessRegistrations(businesses) {
+    return Business.create(businesses.map(business => ({ ...business, isVerified: false })));
+  }
+
+  getBusinessRegistrationsCount() {
+    return Business.count({ isVerified: false }).exec();
+  }
+
+  getAllBusinessRegistrations() {
+    return Business.find({ isVerified: false }).populate('owner').exec();
+  }
+
+  getBusinessRegistrationById(_id) {
+    return Business.findOne({ _id, isVerified: false }).exec();
+  }
+
+  searchBusinessRegistrations(query) {
+    return Business.find({ ...query, isVerified: false }).exec();
+  }
+
+  updateBusinessRegistrationById(_id, updates) {
+    return Business.findOneAndUpdate({ _id, isVerified: false }, updates, { new: true }).exec();
+  }
+
+  deleteBusinessRegistrationById(_id) {
+    return Business.findOneAndRemove({ _id, isVerified: false }).exec();
   }
 }

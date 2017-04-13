@@ -40,12 +40,12 @@ export default ({ api, db }) => {
   });
 
   // Confirm activity type addition request (for admins)
-  api.put('/activity-types/addition-requests/:id/confirm', (req, res) => {
+  api.put('/activity-types/addition-requests/:id/verify', (req, res) => {
     res.json({});
   });
 
   // Discard activity type addition request (for admins)
-  api.delete('/activity-types/addition-requests/:id/confirm', (req, res) => {
+  api.delete('/activity-types/addition-requests/:id/verify', (req, res) => {
     res.json({});
   });
 };

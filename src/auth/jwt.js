@@ -20,8 +20,8 @@ export default {
     reject();
   }),
 
-  isOwner: token => new Promise((resolve, reject) => {
-    if (token.role === roles.OWNER) resolve();
+  isBusinessOwner: token => new Promise((resolve, reject) => {
+    if (token.role === roles.BUSINESS_OWNER) resolve();
     reject();
   }),
 

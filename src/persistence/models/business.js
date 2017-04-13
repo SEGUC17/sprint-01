@@ -17,6 +17,11 @@ const businessSchema = mongoose.Schema({
     type: String,
   },
 
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+
   location: {
     longitude: {
       type: Number,

@@ -1,5 +1,5 @@
 export default {
   CLIENT: 'CLIENT',
-  OWNER: 'OWNER',
+  BUSINESS_OWNER: 'BUSINESS OWNER',
   ADMIN: 'ADMIN',
 };

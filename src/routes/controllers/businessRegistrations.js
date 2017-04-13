@@ -3,15 +3,19 @@ import jwt from '../../auth/jwt';
 import errors from '../../constants/errors';
 
 export default ({ api, db }) => {
-  /** List all businesses (for businesses, clients & admins) */
+  /** List all business signups (for admins) */
 
-  api.get('/businesses', (req, res, next) => {
+  api.get('/business-registrations', (req, res, next) => {
     // Verify JWT validity
     jwt.verify(req)
       // Invalid JWT
       .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }))
+      // Check if admin
+      .then(token => jwt.isAdmin(token))
+      // Not an admin
+      .catch(() => res.status(403).json({ error: errors.NOT_ADMIN.message, data: null }))
       // Get resource
-      .then(db.getAllBusinesses)
+      .then(db.getAllBusinessRegistrations)
       // Couldn't get resource
       .catch(() => res.status(500).json({ error: errors.INTERNAL_SERVER_ERROR.message, data: null }))
       // Respond with resource
@@ -27,39 +31,19 @@ export default ({ api, db }) => {
       .catch(() => next());
   });
 
-  /** Search businesses (for businesses, clients & admins) */
+  /** View business signup (for admins) */
 
-  api.get('/businesses/search', (req, res, next) => {
+  api.get('/business-registrations/:id', (req, res, next) => {
     // Verify JWT validity
     jwt.verify(req)
       // Invalid JWT
       .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }))
+      // Check if admin
+      .then(token => jwt.isAdmin(token))
+      // Not an admin
+      .catch(() => res.status(403).json({ error: errors.NOT_ADMIN.message, data: null }))
       // Get resource
-      .then(() => db.searchBusinesses(req.query))
-      // Couldn't get resource
-      .catch(() => res.status(500).json({ error: errors.INTERNAL_SERVER_ERROR.message, data: null }))
-      // Respond with resource
-      .then((collection) => {
-        if (_.isEmpty(collection)) {
-          // No match
-          return res.status(404).json({ error: errors.ENTITY_NOT_FOUND.message, data: { collection } });
-        }
-        // Resource found
-        return res.status(200).json({ error: null, data: { collection } });
-      })
-      // Done
-      .catch(() => next());
-  });
-
-  /** View business profile (for businesses, clients & admins) */
-
-  api.get('/businesses/:id', (req, res, next) => {
-    // Verify JWT validity
-    jwt.verify(req)
-      // Invalid JWT
-      .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }))
-      // Get resource
-      .then(() => db.getBusinessById(req.params.id))
+      .then(() => db.getBusinessRegistrationById(req.params.id))
       // Couldn't get resource
       .catch(() => res.status(500).json({ error: errors.INTERNAL_SERVER_ERROR.message, data: null }))
       // Respond with resource
@@ -75,19 +59,40 @@ export default ({ api, db }) => {
       .catch(() => next());
   });
 
-  /** Edit business profile (for businesses) */
+  /** Signup for business (for clients) */
 
-  api.put('/businesses/:id', (req, res, next) => {
+  api.post('/business-registrations', (req, res, next) => {
     // Verify JWT validity
     jwt.verify(req)
       // Invalid JWT
       .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }))
-      // Check if business owner
-      .then(token => jwt.isBusinessOwner(token))
-      // Not a business owner
-      .catch(() => res.status(403).json({ error: errors.NOT_BUSINESS_OWNER.message, data: null }))
+      // Check if client
+      .then(token => jwt.isClient(token))
+      // Not a client
+      .catch(() => res.status(403).json({ error: errors.NOT_CLIENT.message, data: null }))
+      // Create resource
+      .then(() => db.insertOneBusinessRegistration(req.body))
+      // Couldn't create resource
+      .catch(() => res.status(500).json({ error: errors.INTERNAL_SERVER_ERROR.message, data: null }))
+      // Respond with created resource
+      .then(document => res.status(201).json({ error: null, data: { document } }))
+      // Done
+      .catch(() => next());
+  });
+
+  /** Confirm business signup (for admins) */
+
+  api.put('/business-registrations/:id/verify', (req, res, next) => {
+    // Verify JWT validity
+    jwt.verify(req)
+      // Invalid JWT
+      .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }))
+      // Check if admin
+      .then(token => jwt.isAdmin(token))
+      // Not an admin
+      .catch(() => res.status(403).json({ error: errors.NOT_ADMIN.message, data: null }))
       // Update resource
-      .then(() => db.updateBusinessById(req.params.id, req.body))
+      .then(() => db.updateBusinessRegistrationById(req.params.id, { isVerified: true }))
       // Couldn't update resource
       .catch(() => res.status(500).json({ error: errors.INTERNAL_SERVER_ERROR.message, data: null }))
       // Respond with updated resource
@@ -96,26 +101,26 @@ export default ({ api, db }) => {
           // No match & nothing updated
           return res.status(404).json({ error: errors.ENTITY_NOT_FOUND.message, data: { document } });
         }
-        // Resource found & update
+        // Resource found & updated
         return res.status(200).json({ error: null, data: { document } });
       })
       // Done
       .catch(() => next());
   });
 
-  /** Delete business profile (for businesses) */
+  /** Discard business signup (for admins) */
 
-  api.delete('/businesses/:id', (req, res, next) => {
+  api.delete('/business-registrations/:id/verify', (req, res, next) => {
     // Verify JWT validity
     jwt.verify(req)
       // Invalid JWT
       .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }))
-      // Check if business owner
-      .then(token => jwt.isBusinessOwner(token))
-      // Not a business owner
-      .catch(() => res.status(403).json({ error: errors.NOT_BUSINESS_OWNER.message, data: null }))
+      // Check if admin
+      .then(token => jwt.isAdmin(token))
+      // Not an admin
+      .catch(() => res.status(403).json({ error: errors.NOT_ADMIN.message, data: null }))
       // Delete resource
-      .then(() => db.deleteBusinessById(req.params.id))
+      .then(() => db.deleteBusinessRegistrationById(req.params.id))
       // Couldn't delete resource
       .catch(() => res.status(500).json({ error: errors.INTERNAL_SERVER_ERROR.message, data: null }))
       // Respond with deleted resource
