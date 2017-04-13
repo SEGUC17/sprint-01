@@ -15,9 +15,18 @@ export default {
     });
   }),
 
-  isAdmin: token => token.role === roles.ADMIN,
+  isAdmin: token => new Promise((resolve, reject) => {
+    if (token.role === roles.ADMIN) resolve();
+    reject();
+  }),
 
-  isOwner: token => token.role === roles.OWNER,
+  isOwner: token => new Promise((resolve, reject) => {
+    if (token.role === roles.OWNER) resolve();
+    reject();
+  }),
 
-  isClient: token => token.role === roles.CLIENT,
+  isClient: token => new Promise((resolve, reject) => {
+    if (token.role === roles.CLIENT) resolve();
+    reject();
+  }),
 };

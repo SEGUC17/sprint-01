@@ -1,5 +1,6 @@
 [
   {
+    "_id": "58ef3182493f031b1cd66b70",
     "name": "KFC",
     "description": "American fast food restaurant chain that specializes in fried chicken",
     "location": {
@@ -27,6 +28,7 @@
     ]
   },
   {
+    "_id": "58ef3182493f031b1cd66b71",
     "name": "McDonald's",
     "description": "American hamburger and fast food restaurant chain",
     "location": {
