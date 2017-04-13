@@ -65,7 +65,8 @@ const activitySchema = mongoose.Schema({
   ],
 });
 
-activitySchema.pre('save', (next) => {
+// eslint-disable-next-line prefer-arrow-callback, func-names
+activitySchema.pre('save', function (next) {
   this.activityType = new mongoose.Schema.Types.ObjectId(this.activityType);
   next();
 });

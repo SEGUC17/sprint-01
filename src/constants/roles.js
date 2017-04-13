@@ -1,5 +1,0 @@
-export default {
-  CLIENT: 'CLIENT',
-  BUSINESS_OWNER: 'BUSINESS OWNER',
-  ADMIN: 'ADMIN',
-};

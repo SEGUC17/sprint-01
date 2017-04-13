@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import config from '../constants/config';
+import User from './models/user';
 import Business from './models/business';
 
 export default class Database {
@@ -19,6 +20,90 @@ export default class Database {
     mongoose.connection.db.dropDatabase();
   }
 
+  /** Helpers */
+
+  obscureMongooseObjectPassword(object) {
+    return { ...object.toObject(), password: undefined };
+  }
+
+  /** Users */
+
+  getUserByUsername({ username }) {
+    return User.findOne({ username }).exec();
+  }
+
+  /** Clients */
+
+  insertOneClient(client) {
+    return User.create({ ...client, isAdmin: false })
+      .then(createdClient => this.obscureMongooseObjectPassword(createdClient));
+  }
+
+  insertClients(clients) {
+    return User.create(clients.map(client => ({ ...client, isAdmin: false })))
+      .then(createdClients => createdClients.map(this.obscureMongooseObjectPassword));
+  }
+
+  getClientsCount() {
+    return User.count({ isAdmin: false }).exec();
+  }
+
+  getAllClients() {
+    return User.find({ isAdmin: false }).select('-password').exec();
+  }
+
+  getClientById(_id) {
+    return User.findOne({ _id, isAdmin: false }).select('-password').exec();
+  }
+
+  searchClients(query) {
+    return User.find({ ...query, isAdmin: false }).select('-password').exec();
+  }
+
+  updateClientById(_id, updates) {
+    return User.findOneAndUpdate({ _id, isAdmin: false }, updates, { new: true }).select('-password').exec();
+  }
+
+  deleteClientById(_id) {
+    return User.findOneAndRemove({ _id, isAdmin: false }).select('-password').exec();
+  }
+
+  /** Admins */
+
+  insertOneAdmin(admin) {
+    return User.create({ ...admin, isAdmin: true })
+      .then(createdAdmin => this.obscureMongooseObjectPassword(createdAdmin));
+  }
+
+  insertAdmins(admins) {
+    return User.create(admins.map(admin => ({ ...admin, isAdmin: true })))
+      .then(createdAdmins => createdAdmins.map(this.obscureMongooseObjectPassword));
+  }
+
+  getAdminsCount() {
+    return User.count({ isAdmin: true }).exec();
+  }
+
+  getAllAdmins() {
+    return User.find({ isAdmin: true }).select('-password').exec();
+  }
+
+  getAdminById(_id) {
+    return User.findOne({ _id, isAdmin: true }).select('-password').exec();
+  }
+
+  searchAdmins(query) {
+    return User.find({ ...query, isAdmin: true }).select('-password').exec();
+  }
+
+  updateAdminById(_id, updates) {
+    return User.findOneAndUpdate({ _id, isAdmin: true }, updates, { new: true }).select('-password').exec();
+  }
+
+  deleteAdminById(_id) {
+    return User.findOneAndRemove({ _id, isAdmin: true }).select('-password').exec();
+  }
+
   /** Businesses */
 
   insertOneBusiness(business) {
@@ -34,7 +119,7 @@ export default class Database {
   }
 
   getAllBusinesses() {
-    return Business.find({ isVerified: true }).populate('owner').exec();
+    return Business.find({ isVerified: true }).exec();
   }
 
   getBusinessById(_id) {
@@ -76,7 +161,7 @@ export default class Database {
   }
 
   getAllBusinessRegistrations() {
-    return Business.find({ isVerified: false }).populate('owner').exec();
+    return Business.find({ isVerified: false }).exec();
   }
 
   getBusinessRegistrationById(_id) {

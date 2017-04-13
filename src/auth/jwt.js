@@ -1,10 +1,9 @@
 import jwt from 'jsonwebtoken';
 import config from '../constants/config';
-import roles from '../constants/roles';
 
 export default {
-  sign: ({ id, role }) =>
-    jwt.sign({ id, role }, config.auth.secret),
+  sign: ({ username, isAdmin }) =>
+    jwt.sign({ username, isAdmin }, config.auth.secret),
 
   verify: req => new Promise((resolve, reject) => {
     const token = req.headers[config.auth.header];
@@ -16,17 +15,12 @@ export default {
   }),
 
   isAdmin: token => new Promise((resolve, reject) => {
-    if (token.role === roles.ADMIN) return resolve(token);
-    return reject();
-  }),
-
-  isBusinessOwner: token => new Promise((resolve, reject) => {
-    if (token.role === roles.BUSINESS_OWNER) return resolve(token);
+    if (token.isAdmin) return resolve(token);
     return reject();
   }),
 
   isClient: token => new Promise((resolve, reject) => {
-    if (token.role === roles.CLIENT) return resolve(token);
+    if (!token.isAdmin) return resolve(token);
     return reject();
   }),
 };

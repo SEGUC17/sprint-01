@@ -1,11 +1,15 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcrypt-nodejs';
-import roles from '../../constants/roles';
+import bcrypt from '../../auth/bcrypt';
 
 const userSchema = mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+
+  isAdmin: {
+    type: Boolean,
+    default: false,
   },
 
   username: {
@@ -14,7 +18,12 @@ const userSchema = mongoose.Schema({
     required: true,
   },
 
-  name: mongoose.Schema({
+  password: {
+    type: String,
+    required: true,
+  },
+
+  name: {
     first: {
       type: String,
       required: true,
@@ -24,10 +33,11 @@ const userSchema = mongoose.Schema({
       type: String,
       required: true,
     },
-  }),
+  },
 
   mobile: {
-    type: Date,
+    type: String,
+    required: true,
   },
 
   email: {
@@ -36,26 +46,17 @@ const userSchema = mongoose.Schema({
   },
 
   media: {
-    profile: {
+    profilePicture: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Image',
     },
   },
-
-  role: {
-    type: String,
-    required: true,
-    enum: [roles.CLIENT, roles.ADMIN, roles.BUSINESS_OWNER],
-  },
 });
 
-// Generate a hash
-userSchema.methods.generateHash = password =>
-  bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
-
-
-// Compare passwords
-userSchema.methods.validPassword = password =>
-  bcrypt.compareSync(password, this.local.password);
+// eslint-disable-next-line prefer-arrow-callback, func-names
+userSchema.pre('save', function (next) {
+  this.password = bcrypt.hash(this.password);
+  next();
+});
 
 export default mongoose.model('User', userSchema);
