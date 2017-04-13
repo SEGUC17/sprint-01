@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import config from '../config/main';
+import config from '../constants/config';
 import roles from '../constants/roles';
 
 export default {

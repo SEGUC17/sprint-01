@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 import Database from '../src/persistence/db';
-import config from '../src/config/main';
+import config from '../src/constants/config';
 import businesses from './examples/businesses.json';
 
 const expect = chai.expect;
