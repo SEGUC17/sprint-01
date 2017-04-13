@@ -53,6 +53,14 @@ export default class Database {
     return Business.findOneAndRemove({ _id, isVerified: true }).exec();
   }
 
+  isRightfulBusinessOwner(ownerId, businessId) {
+    return new Promise(async (resolve, reject) => {
+      const business = await this.getBusinessById(businessId);
+      if (ownerId === business.owner.toString()) return resolve();
+      return reject();
+    });
+  }
+
   /** Business Registrations */
 
   insertOneBusinessRegistration(business) {

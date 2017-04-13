@@ -3,8 +3,8 @@ import config from '../config/main';
 import roles from '../constants/roles';
 
 export default {
-  sign: ({ username, role }) =>
-    jwt.sign({ username, role }, config.auth.secret),
+  sign: ({ id, role }) =>
+    jwt.sign({ id, role }, config.auth.secret),
 
   verify: req => new Promise((resolve, reject) => {
     const token = req.headers[config.auth.header];
@@ -16,17 +16,17 @@ export default {
   }),
 
   isAdmin: token => new Promise((resolve, reject) => {
-    if (token.role === roles.ADMIN) resolve();
-    reject();
+    if (token.role === roles.ADMIN) return resolve(token);
+    return reject();
   }),
 
   isBusinessOwner: token => new Promise((resolve, reject) => {
-    if (token.role === roles.BUSINESS_OWNER) resolve();
-    reject();
+    if (token.role === roles.BUSINESS_OWNER) return resolve(token);
+    return reject();
   }),
 
   isClient: token => new Promise((resolve, reject) => {
-    if (token.role === roles.CLIENT) resolve();
-    reject();
+    if (token.role === roles.CLIENT) return resolve(token);
+    return reject();
   }),
 };

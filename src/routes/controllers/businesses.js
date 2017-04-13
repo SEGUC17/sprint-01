@@ -86,6 +86,10 @@ export default ({ api, db }) => {
       .then(token => jwt.isBusinessOwner(token))
       // Not a business owner
       .catch(() => res.status(403).json({ error: errors.NOT_BUSINESS_OWNER.message, data: null }))
+      // Check if business owner owns this business
+      .then(token => db.isRightfulBusinessOwner(token.id, req.params.id))
+      // Business owner doesn't own this business
+      .catch(() => res.status(403).json({ error: errors.NOT_RIGHTFUL_BUSINESS_OWNER.message, data: null }))
       // Update resource
       .then(() => db.updateBusinessById(req.params.id, req.body))
       // Couldn't update resource
@@ -114,6 +118,10 @@ export default ({ api, db }) => {
       .then(token => jwt.isBusinessOwner(token))
       // Not a business owner
       .catch(() => res.status(403).json({ error: errors.NOT_BUSINESS_OWNER.message, data: null }))
+      // Check if business owner owns this business
+      .then(token => db.isRightfulBusinessOwner(token.id, req.params.id))
+      // Business owner doesn't own this business
+      .catch(() => res.status(403).json({ error: errors.NOT_RIGHTFUL_BUSINESS_OWNER.message, data: null }))
       // Delete resource
       .then(() => db.deleteBusinessById(req.params.id))
       // Couldn't delete resource
