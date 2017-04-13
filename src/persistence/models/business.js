@@ -6,20 +6,19 @@ const businessSchema = mongoose.Schema({
     default: Date.now,
   },
 
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+
   name: {
     type: String,
     required: true,
     unique: true,
-    trim: true,
   },
 
   description: {
     type: String,
-  },
-
-  isVerified: {
-    type: Boolean,
-    default: false,
   },
 
   location: {

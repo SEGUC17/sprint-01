@@ -21,7 +21,7 @@ const activitySchema = mongoose.Schema({
   ],
 
   /**
-   * @NOTE prices are stored per minute in egyption pounds.
+   * @NOTE: Prices are stored per minute in egyption pounds
    */
   prices: [
     {
@@ -63,12 +63,6 @@ const activitySchema = mongoose.Schema({
       },
     }),
   ],
-});
-
-// eslint-disable-next-line prefer-arrow-callback, func-names
-activitySchema.pre('save', function (next) {
-  this.activityType = new mongoose.Schema.Types.ObjectId(this.activityType);
-  next();
 });
 
 export default mongoose.model('Activity', activitySchema);
