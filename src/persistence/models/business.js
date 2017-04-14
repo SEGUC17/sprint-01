@@ -80,7 +80,7 @@ const businessSchema = mongoose.Schema({
     ref: 'User',
   },
 
-  activites: [
+  activities: [
     {
       type: mongoose.Schema.Types.ObjectId,
       required: true,

@@ -19,22 +19,12 @@ export default ({ api, db }) => {
   api.get('/activities/:id/bookings', (req, res) => {
     // Verify JWT validity
     jwt.verify(req)
-      // Invalid JWT
-      .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }))
-      // Get resource
-      .then(()=> db.getActivityById(req.params.id))
-      // Couldn't get resource
-      .catch(() => res.status(500).json({ error: errors.INTERNAL_SERVER_ERROR.message, data: null }))
-      // Respond with resource
-      .then((activity) => {
-        if (_.isEmpty(activity)) {
-          // No match
-          return res.status(404).json({ error: errors.ACTIVITY_NOT_FOUND.message, data: null });
-        }
-        // Resource found
-        return res.status(200).json({ error: null, data: activity.bookings });
-      });
-
+    //get activity by id
+    .then(()=> db.getActivityById(req.params.id))
+    //get activity by id
+    .then((activity) => { return res.status(200).json({ error: null, data: activity.bookings })})
+    //return errors
+    .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
   });
 
   /** View own activity's confirmed booking (for business owners) */
@@ -42,26 +32,9 @@ export default ({ api, db }) => {
   api.get('/activities/:activityId/bookings/:bookingId', (req, res) => {
     // Verify JWT validity
     jwt.verify(req)
-      // Invalid JWT
-      .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }))
-      // Get resource
-      .then(()=> db.getActivityBookingById(req.params.activityId, req.params.bookingId))
-      // Couldn't get resource
-      .catch((error) => {
-        console.log("here1");
-        res.status(404).json({ error: error.message, data: null })
-      })
-      // Respond with resource
-      .then((booking) => {
-        console.log("here2");
-        if (_.isEmpty(booking)) {
-          // No activity match
-          return res.status(404).json({ error: errors.BOOKING_NOT_FOUND.message, data: null });
-        }
-        console.log(Object.keys(booking));
-        return res.status(200).json({ error: null, data: booking });
-      })
-      .catch((error)=>{console.log(error)});
+    .then(()=> db.getActivityBookingById(req.params.activityId, req.params.bookingId))
+    .then((booking) => { return res.status(200).json({ error: null, data: booking }); })
+    .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
 
   });
 
@@ -69,28 +42,10 @@ export default ({ api, db }) => {
 
   api.put('/activities/:activityId/bookings/:bookingId', (req, res) => {
     // Verify JWT validity
-    // jwt.verify(req)
-    //   // Invalid JWT
-    //   .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }))
-    //   // Get resource
-    //   .then(()=> db.updateActivityById(req.params.activityId, req.body))
-    //   // Couldn't get resource
-    //   .catch(() => res.status(500).json({ error: errors.INTERNAL_SERVER_ERROR.message, data: null }))
-    //   // Respond with resource
-    //   .then((activity) => {
-    //     if (_.isEmpty(activity)) {
-    //       // No activity match
-    //       return res.status(404).json({ error: errors.ACTIVITY_NOT_FOUND.message, data: null });
-    //     }
-    //     let booking = activity.bookings.id(req.params.bookingId));
-    //     if (_.isEmpty(booking)) {
-    //       // No booking match
-    //       return res.status(404).json({ error: errors.BOOKING_NOT_FOUND.message, data: null });
-    //     }
-        
-    //     // Resource found
-    //     return res.status(200).json({ error: null, data: booking });
-    //   });
+    jwt.verify(req)
+      .then((token)=> db.updateActivityBookingById(token.username, req.params.activityId, req.params.bookingId, req.body))
+      .then((activity) => { return res.status(200).json({ error: null, data: activity })})
+      .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
     
     // jwt.verify(req)
     //   .then((token) => {

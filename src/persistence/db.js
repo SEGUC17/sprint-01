@@ -9,6 +9,7 @@ import Activity from './models/activity';
 
 import errors from '../constants/errors'
 
+
 export default class Database {
   /** Construction, Connection & Destruction */
 
@@ -35,7 +36,17 @@ export default class Database {
   /** Users */
 
   getUserByUsername({ username }) {
-    return User.findOne({ username }).exec();
+    return new Promise((resolve, reject)=>{
+      User.findOne({ username }).exec()
+      .then((user)=>{
+        if(_.isEmpty(user)) 
+          reject(errors.USER_NOT_FOUND);
+        
+        resolve(user);
+      })
+      .catch((err)=> reject(errors.INTERNAL_SERVER_ERROR) )
+
+    })
   }
 
   /** Clients */
@@ -131,6 +142,17 @@ export default class Database {
   getBusinessById(_id) {
     return Business.findOne({ _id, isVerified: true }).exec();
   }
+  
+  getBusinessOfActivity(activityId) {
+
+    return new Promise((resolve, reject)=>{
+      Business.findOne({ activities:activityId, isVerified: true}).exec()
+      .then((business)=>{
+          resolve(business);
+
+      })
+    })
+  }
 
   searchBusinesses(query) {
     return Business.find({ ...query, isVerified: true }).exec();
@@ -210,7 +232,17 @@ export default class Database {
   }
 
   getActivityById(_id) {
-    return Activity.findById(_id).exec();
+    return new Promise((resolve, reject) => {
+      Activity.findById(_id).exec()
+        .then((activity)=>{
+          
+          if (_.isEmpty(activity)) {
+            reject(errors.ACTIVITY_NOT_FOUND);
+          } 
+          resolve(activity);
+        })
+        .catch(()=> errors.INTERNAL_SERVER_ERROR);
+      })
   }
 
   searchActivities(query) {
@@ -230,15 +262,52 @@ export default class Database {
   getActivityBookingById(activityId, bookingId) {
     return new Promise((resolve, reject) => {
       this.getActivityById(activityId)
-        .then((activity)=>{
-          
-          if (_.isEmpty(activity)) {
-            reject(errors.ACTIVITY_NOT_FOUND);
-          } 
-          resolve(activity.bookings.id(bookingId));
-        })
+      .then((activity)=>{
+        let booking = activity.bookings.id(bookingId);
+        if (_.isEmpty(booking)) {
+          reject(errors.BOOKING_NOT_FOUND);
+        } 
+        resolve(booking);
       })
+      .catch((error)=> reject(error))
+      })      
   }
 
+  updateActivityBookingById(username, activityId, bookingId, updates) {
+    return new Promise((resolve, reject) => {
+      this.getActivityById(activityId)
+        .then((activity)=>{
+          return this.isRightfulActivityOwner(username,activityId)
+        })      
+        .then(()=>{
+          let set = Object.keys(updates).reduce((acc, cur)=>{acc['bookings.$.' + cur] = updates[cur]; return acc;}, {});
+          Activity.findOneAndUpdate({_id: activityId, "bookings._id": bookingId}, {$set:set}, {new: true}).exec()
+          .then((activity)=> resolve(activity))
+          .catch((errors)=> reject(errors.INTERNAL_SERVER_ERROR));
+
+        })
+        .catch((error)=> reject(error) )
+
+    })
+  }
+
+  isRightfulActivityOwner(username, activityId) {
+    let activityBusiness;
+    return new Promise((resolve, reject) => {
+      this.getBusinessOfActivity(activityId)
+      .then((business)=> {
+        activityBusiness = business;
+        return this.getUserByUsername({username});
+      })
+      .then((user)=>{
+        if(activityBusiness.owner.toString() === user._id.toString())
+          resolve();
+        reject(errors.UNRIGHTFUL_ACTIVITY_OWNER);
+      })
+
+      .catch((error)=>reject(error));
+
+    });
+  }
 
 }

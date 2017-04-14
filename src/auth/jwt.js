@@ -10,7 +10,7 @@ export default {
     const token = req.headers[config.auth.header];
 
     jwt.verify(token, config.auth.secret, (err, decoded) => {
-      if (err) reject();
+      if (err) reject(errors.INVALID_TOKEN);
       resolve(decoded);
     });
   }),
