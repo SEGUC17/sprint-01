@@ -14,6 +14,7 @@ export default {
   BOOKING_NOT_FOUND: new Error('Booking not found'),
   USER_NOT_FOUND: new Error('User not found'),
   ACTIVITY_NOT_FOUND: new Error('Activity not found'),
+  BOOKING_NOT_FOUND: new Error('Booking not found'),
   BUSINESS_NOT_FOUND: new Error('BUSINESS not found'),
   
   INTERNAL_SERVER_ERROR: new Error('Internal Server Error'),

@@ -7,6 +7,8 @@ import ActivityType from '../../persistence/models/activityType';
 import Business from '../../persistence/models/business';
 
 import mongoose from 'mongoose';
+import _ from 'lodash';
+
 let ObjectId = mongoose.Types.ObjectId;
 
 
@@ -15,47 +17,75 @@ export default ({ api, db }) => {
   /** List own activity's confirmed bookings (for business owners) */
 
   api.get('/activities/:id/bookings', (req, res) => {
+    // Verify JWT validity
     jwt.verify(req)
-      .then((token) => {
-        let activityId = ObjectId(req.params.id);
-        Activity.findById(activityId).exec()
-        .then((activity)=>{
-          return res.status(200).json({ error: null, data: activity.bookings||[]}) 
-        })
-        .catch((error) =>{
-          res.status(401).json({ error: errors.ENTITY_NOT_FOUND.message, data: null });
-        })
-          
-      })
-      .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }));
-    });
+      // Invalid JWT
+      .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }))
+      // Get resource
+      .then(()=> db.getActivityById(ObjectId(req.params.id)))
+      // Couldn't get resource
+      .catch(() => res.status(500).json({ error: errors.INTERNAL_SERVER_ERROR.message, data: null }))
+      // Respond with resource
+      .then((activity) => {
+        if (_.isEmpty(activity)) {
+          // No match
+          return res.status(404).json({ error: errors.ACTIVITY_NOT_FOUND.message, data: null });
+        }
+        // Resource found
+        return res.status(200).json({ error: null, data: activity.bookings });
+      });
+
+  });
 
   /** View own activity's confirmed booking (for business owners) */
 
   api.get('/activities/:activityId/bookings/:bookingId', (req, res) => {
+    // Verify JWT validity
     jwt.verify(req)
-      .then((token) => {
-        if (!token.isAdmin) {
-
-          let activityId = ObjectId(req.params.activityId);
-          let bookingId = ObjectId(req.params.bookingId);
-          
-          Activity.findById(activityId).exec()
-          .then((activity)=>{
-            
-            let booking = activity.bookings.id(bookingId);
-            if(!!booking)
-              res.status(200).json({ error: null, data: booking});
-            else
-              res.status(404).json({ error: errors.BOOKING_NOT_FOUND.message, data: null})
-          })
-          .catch((error) => res.status(401).json({ error: error.message, data: null }))
-          
+      // Invalid JWT
+      .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }))
+      // Get resource
+      .then(()=> db.getActivityById(ObjectId(req.params.activityId)))
+      // Couldn't get resource
+      .catch(() => res.status(500).json({ error: errors.INTERNAL_SERVER_ERROR.message, data: null }))
+      // Respond with resource
+      .then((activity) => {
+        if (_.isEmpty(activity)) {
+          // No activity match
+          return res.status(404).json({ error: errors.ACTIVITY_NOT_FOUND.message, data: null });
         }
-        else
-          return res.status(403).json({ error: errors.NOT_BUSINESS.message, data: null });
-      })
-      .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }));
+        let booking = activity.bookings.id(ObjectId(req.params.bookingId));
+        if (_.isEmpty(booking)) {
+          // No booking match
+          return res.status(404).json({ error: errors.BOOKING_NOT_FOUND.message, data: null });
+        }
+        
+        // Resource found
+        return res.status(200).json({ error: null, data: booking });
+      });
+    // jwt.verify(req)
+    //   .then((token) => {
+    //     if (!token.isAdmin) {
+
+    //       let activityId = ObjectId(req.params.activityId);
+    //       let bookingId = ObjectId(req.params.bookingId);
+          
+    //       Activity.findById(activityId).exec()
+    //       .then((activity)=>{
+            
+    //         let booking = activity.bookings.id(bookingId);
+    //         if(!!booking)
+    //           res.status(200).json({ error: null, data: booking});
+    //         else
+    //           res.status(404).json({ error: errors.BOOKING_NOT_FOUND.message, data: null})
+    //       })
+    //       .catch((error) => res.status(401).json({ error: error.message, data: null }))
+          
+    //     }
+    //     else
+    //       return res.status(403).json({ error: errors.NOT_BUSINESS.message, data: null });
+    //   })
+    //   .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }));
   });
 
   /** Edit own activity's confirmed booking (for business owners) */

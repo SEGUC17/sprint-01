@@ -8,6 +8,7 @@ import businesses from './examples/businesses.json';
 
 import jwt from '../src/auth/jwt';
 import mongoose from 'mongoose';
+let ObjectId = mongoose.Types.ObjectId;
 import _ from 'lodash'
 
 import app from '../src/app';
@@ -111,6 +112,18 @@ describe('ActivityBooking', () => {
       });
 
     });
+    
+    it('should return 404 if activity is not found', (done) =>{      
+      chai.request(app)
+		    .get(`/api/activities/${ObjectId()}/bookings`)
+        .set('x-auth-token', testData.businessToken)
+		    .end((err, res) => {
+			  	expect(res).to.have.status(404);
+			  	expect(res.body.error).to.equal(errors.ACTIVITY_NOT_FOUND.message);
+		      done();
+      });
+
+    });
 
   });
   
@@ -124,6 +137,30 @@ describe('ActivityBooking', () => {
 			  	expect(res.body.error).to.be.null;
 			  	expect(res.body.data).to.be.an('object');
 			  	expect(res.body.data.client).to.equal(testData.userDoc._id.toString());
+		      done();
+      });
+
+    });
+
+     it('should return 404 if activity is not found', (done) =>{      
+      chai.request(app)
+		    .get(`/api/activities/${ObjectId()}/bookings/${testData.activityDoc.bookings[0]._id}`)
+        .set('x-auth-token', testData.businessToken)
+		    .end((err, res) => {
+			  	expect(res).to.have.status(404);
+			  	expect(res.body.error).to.equal(errors.ACTIVITY_NOT_FOUND.message);
+		      done();
+      });
+
+    });
+
+     it('should return 404 if booking is not found', (done) =>{      
+      chai.request(app)
+		    .get(`/api/activities/${testData.activityDoc._id}/bookings/${ObjectId()}`)
+        .set('x-auth-token', testData.businessToken)
+		    .end((err, res) => {
+			  	expect(res).to.have.status(404);
+			  	expect(res.body.error).to.equal(errors.BOOKING_NOT_FOUND.message);
 		      done();
       });
 

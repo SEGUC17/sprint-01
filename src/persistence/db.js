@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 import config from '../constants/config';
+
 import User from './models/user';
 import Business from './models/business';
+import Activity from './models/activity';
 
 export default class Database {
   /** Construction, Connection & Destruction */
@@ -184,4 +186,39 @@ export default class Database {
   deleteBusinessRegistrationById(_id) {
     return Business.findOneAndRemove({ _id, isVerified: false }).exec();
   }
+
+  /** Activities Registrations */
+  
+  insertOneActivity(activity) {
+    return Activity.create(business);
+  }
+
+  insertActivities(activities) {
+    return Activity.create(activities);
+  }
+
+  getActivitiesCount() {
+    return Activity.count().exec();
+  }
+
+  getAllActivitys() {
+    return Activity.find({ isVerified: false }).exec();
+  }
+
+  getActivityById(_id) {
+    return Activity.findById(_id).exec();
+  }
+
+  searchActivities(query) {
+    return Activity.find({ ...query, isVerified: false }).exec();
+  }
+
+  updateActivityById(_id, updates) {
+    return Activity.findOneAndUpdate({ _id, isVerified: false }, updates, { new: true }).exec();
+  }
+
+  deleteActivityById(_id) {
+    return Activity.findOneAndRemove({ _id, isVerified: false }).exec();
+  }
+
 }
