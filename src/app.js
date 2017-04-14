@@ -20,15 +20,26 @@ app.use(morgan('dev'));
 const db = new Database();
 
 db.connect()
-  .then(async () => {
+  .then(() => {
     if (config.database.reseed) db.drop();
 
-    const adminsCount = await db.getAdminsCount();
-    if (adminsCount === 0) await db.insertOneAdmin(config.masterAdmin);
+    return db.getAdminsCount().
+      then((adminsCount)=>{
+        if (adminsCount === 0) 
+          return db.insertOneAdmin(config.masterAdmin);
+        return Promise.resolve()
+      })
+      .then(()=>{
+        // DUMMY DATA FOR TESTING
+        // return Promise.all([
+        //    db.insertClients(clients),
+        //    db.insertBusinesses(businesses)
+        // ])
+        return Promise.resolve()
+      })
 
-    // DUMMY DATA FOR TESTING
-    await db.insertClients(clients);
-    await db.insertBusinesses(businesses);
+
+   
   })
   .then(() => {
     app.use('/', express.static('public'));
@@ -40,3 +51,6 @@ db.connect()
   .catch((err) => {
     console.error(err.message);
   });
+
+app.use('/api/', api({ db }));
+export default app;

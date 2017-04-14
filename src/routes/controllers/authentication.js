@@ -40,7 +40,7 @@ export default ({ api, db }) => {
 
   /** Login as client or admin (for visitors) */
 
-  api.post('/login', async (req, res, next) => {
+  api.post('/login', (req, res) => {
     // Search users by username
     db.getUserByUsername({ username: req.body.username })
       // Couldn't execute search

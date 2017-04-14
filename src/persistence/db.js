@@ -139,10 +139,15 @@ export default class Database {
   }
 
   isRightfulBusinessOwner(ownerId, businessId) {
-    return new Promise(async (resolve, reject) => {
-      const business = await this.getBusinessById(businessId);
-      if (ownerId === business.owner.toString()) return resolve();
-      return reject();
+    return new Promise((resolve, reject) => {
+      this.getBusinessById(businessId)
+        .then((business)=>{
+          
+          if (ownerId === business.owner.toString()) return resolve();
+          
+          return reject();
+
+        })
     });
   }
 
