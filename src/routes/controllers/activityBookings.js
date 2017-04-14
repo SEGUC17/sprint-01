@@ -47,19 +47,34 @@ export default ({ api, db }) => {
       .then((activity) => { return res.status(200).json({ error: null, data: activity })})
       .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
     
+  });
+
+  /** Delete own activity's confirmed booking (for business owners) */
+
+  api.delete('/activities/:activityId/bookings/:bookingId', (req, res) => {
+    jwt.verify(req)
+      .then((token)=> db.deleteActivityBookingById(token.username, req.params.activityId, req.params.bookingId, req.body))
+      .then(() => { return res.status(200).json({ error: null, data: null })})
+      .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
+    
     // jwt.verify(req)
     //   .then((token) => {
     //     if (!token.isAdmin) {
+
     //       let activityId = ObjectId(req.params.activityId);
     //       let bookingId = ObjectId(req.params.bookingId);
           
-    //       let set = Object.keys(req.body).reduce((acc, cur)=>{acc['bookings.$.' + cur] = req.body[cur]; return acc;}, {});
-
     //       CheckActivityOwnerPromise(token.username,activityId)
     //       .then(()=>{
-    //         Activity.update({_id: activityId, "bookings._id": bookingId},{$set: set})
-    //         .then((numAffected)=>{
-    //             res.status(200).json({ error: null, data: numAffected});
+    //         Activity.findById(activityId).exec()
+    //         .then((activity)=>{
+              
+    //           let booking = activity.bookings.id(bookingId)
+
+    //           activity.save()
+    //           .then((activity)=> res.status(200).json({ error: null, data: null}))
+    //           .catch((error) => res.status(401).json({ error: error, data: null }))
+
     //         })
     //         .catch((error) => res.status(401).json({ error: error.message, data: null }))
     //       })
@@ -68,42 +83,8 @@ export default ({ api, db }) => {
     //     }
     //     else
     //       return res.status(403).json({ error: errors.NOT_BUSINESS.message, data: null });
-
     //   })
-    //   .catch((err) =>  res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }) );
-  });
-
-  /** Delete own activity's confirmed booking (for business owners) */
-
-  api.delete('/activities/:activityId/bookings/:bookingId', (req, res) => {
-    jwt.verify(req)
-      .then((token) => {
-        if (!token.isAdmin) {
-
-          let activityId = ObjectId(req.params.activityId);
-          let bookingId = ObjectId(req.params.bookingId);
-          
-          CheckActivityOwnerPromise(token.username,activityId)
-          .then(()=>{
-            Activity.findById(activityId).exec()
-            .then((activity)=>{
-              
-              activity.bookings.id(bookingId).remove();
-
-              activity.save()
-              .then((activity)=> res.status(200).json({ error: null, data: null}))
-              .catch((error) => res.status(401).json({ error: error, data: null }))
-
-            })
-            .catch((error) => res.status(401).json({ error: error.message, data: null }))
-          })
-          .catch((error) => res.status(403).json({ error: errors.UNAUTHORIZED.message, data: null }))
-          
-        }
-        else
-          return res.status(403).json({ error: errors.NOT_BUSINESS.message, data: null });
-      })
-      .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }));
+    //   .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }));
   });
 
   /** List own activity's booking requests (for business owners) */

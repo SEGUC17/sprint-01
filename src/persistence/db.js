@@ -290,6 +290,25 @@ export default class Database {
 
     })
   }
+  
+  deleteActivityBookingById(username, activityId, bookingId, updates) {
+    return new Promise((resolve, reject) => {
+      this.getActivityById(activityId)
+        .then((activity)=>{
+          return this.isRightfulActivityOwner(username,activityId)
+        })
+        .then(()=>this.getActivityById(activityId))
+        .then((activity)=>{
+          let booking = activity.bookings.id(bookingId);
+          if(_.isEmpty(booking)) reject(errors.BOOKING_NOT_FOUND);
+          booking.remove();
+          return activity.save();
+        })
+        .then( (activity)=> resolve() )
+        .catch( (error)=> reject(error) )
+
+    })
+  }
 
   isRightfulActivityOwner(username, activityId) {
     let activityBusiness;

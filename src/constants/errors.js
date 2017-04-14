@@ -15,7 +15,6 @@ export default {
   BOOKING_NOT_FOUND: {message:'Booking not found', status:404},
   USER_NOT_FOUND: {message:'User not found', status:404},
   ACTIVITY_NOT_FOUND: {message:'Activity not found', status:404},
-  BOOKING_NOT_FOUND: {message:'Booking not found', status:404},
   BUSINESS_NOT_FOUND: {message:'BUSINESS not found', status:404},
   
   INTERNAL_SERVER_ERROR: {message:'Internal Server Error', status:500},

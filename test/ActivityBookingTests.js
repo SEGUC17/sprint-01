@@ -202,10 +202,50 @@ describe('ActivityBooking', () => {
     it('should ensure that the issuer is the business owner', (done) =>{
       chai.request(app)
 		    .put(`/api/activities/${testData.activityDoc._id}/bookings/${testData.activityDoc.bookings[0]._id}`)
-        .set('x-auth-token', jwt.sign({username:'john.doe', role:'BUSINESS'}))
+        .set('x-auth-token', jwt.sign({username:testData.userDoc.username, role:'BUSINESS'}))
         .send({
           isConfirmed: true
         })
+		    .end((err, res) => {
+			  	expect(res).to.have.status(403);
+			  	expect(res.body.data).to.be.null;
+			  	expect(res.body.error).to.equal(errors.UNRIGHTFUL_ACTIVITY_OWNER.message);
+		      done();
+          
+      });
+    });
+
+  });
+
+  describe('DELETE /activities/:activityId/bookings/:bookingId', () => {
+    it('should delete the right Id', (done) =>{
+      chai.request(app)
+		    .delete(`/api/activities/${testData.activityDoc._id}/bookings/${testData.activityDoc.bookings[0]._id}`)
+        .set('x-auth-token', testData.businessToken)
+		    .end((err, res) => {
+			  	expect(res).to.have.status(200);
+			  	expect(res.body.error).to.be.null;
+			  	expect(res.body.data).to.be.null;
+		      done();
+      });
+
+    });
+
+    it('should verify token', (done) =>{
+      chai.request(app)
+		    .delete(`/api/activities/${testData.activityDoc._id}/bookings/${testData.activityDoc.bookings[0]._id}`)
+		    .end((err, res) => {
+			  	expect(res).to.have.status(401);
+			  	expect(res.body.data).to.be.null;
+			  	expect(res.body.error).to.equal(errors.INVALID_TOKEN.message);
+		      done();
+      });
+    });
+
+    it('should ensure that the issuer is the business owner', (done) =>{
+      chai.request(app)
+		    .delete(`/api/activities/${testData.activityDoc._id}/bookings/${testData.activityDoc.bookings[0]._id}`)
+        .set('x-auth-token', jwt.sign({username:testData.userDoc.username, role:'BUSINESS'}))
 		    .end((err, res) => {
 			  	expect(res).to.have.status(403);
 			  	expect(res.body.data).to.be.null;
@@ -215,44 +255,5 @@ describe('ActivityBooking', () => {
     });
 
   });
-
-  // describe('DELETE /activities/:activityId/bookings/:bookingId', () => {
-  //   it('should delete the right Id', (done) =>{
-  //     chai.request(app)
-	// 	    .delete(`/api/activities/${testData.activityDoc._id}/bookings/${testData.activityDoc.bookings[0]._id}`)
-  //       .set('x-auth-token', testData.businessToken)
-	// 	    .end((err, res) => {
-	// 		  	expect(res).to.have.status(200);
-	// 		  	expect(res.body.error).to.be.null;
-	// 		  	expect(res.body.data).to.be.null;
-	// 	      done();
-  //     });
-
-  //   });
-
-  //   it('should verify token', (done) =>{
-  //     chai.request(app)
-	// 	    .delete(`/api/activities/${testData.activityDoc._id}/bookings/${testData.activityDoc.bookings[0]._id}`)
-	// 	    .end((err, res) => {
-	// 		  	expect(res).to.have.status(401);
-	// 		  	expect(res.body.data).to.be.null;
-	// 		  	expect(res.body.error).to.equal(errors.INVALID_TOKEN.message);
-	// 	      done();
-  //     });
-  //   });
-
-  //   it('should ensure that the issuer is the business owner', (done) =>{
-  //     chai.request(app)
-	// 	    .delete(`/api/activities/${testData.activityDoc._id}/bookings/${testData.activityDoc.bookings[0]._id}`)
-  //       .set('x-auth-token', jwt.sign({username:'fakeName', role:'BUSINESS'}))
-	// 	    .end((err, res) => {
-	// 		  	expect(res).to.have.status(403);
-	// 		  	expect(res.body.data).to.be.null;
-	// 		  	expect(res.body.error).to.equal(errors.UNAUTHORIZED.message);
-	// 	      done();
-  //     });
-  //   });
-
-  // });
 
 });
