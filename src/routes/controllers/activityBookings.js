@@ -22,7 +22,7 @@ export default ({ api, db }) => {
       // Invalid JWT
       .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }))
       // Get resource
-      .then(()=> db.getActivityById(ObjectId(req.params.id)))
+      .then(()=> db.getActivityById(req.params.id))
       // Couldn't get resource
       .catch(() => res.status(500).json({ error: errors.INTERNAL_SERVER_ERROR.message, data: null }))
       // Respond with resource
@@ -45,76 +45,77 @@ export default ({ api, db }) => {
       // Invalid JWT
       .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }))
       // Get resource
-      .then(()=> db.getActivityById(ObjectId(req.params.activityId)))
+      .then(()=> db.getActivityBookingById(req.params.activityId, req.params.bookingId))
       // Couldn't get resource
-      .catch(() => res.status(500).json({ error: errors.INTERNAL_SERVER_ERROR.message, data: null }))
+      .catch((error) => {
+        console.log("here1");
+        res.status(404).json({ error: error.message, data: null })
+      })
       // Respond with resource
-      .then((activity) => {
-        if (_.isEmpty(activity)) {
-          // No activity match
-          return res.status(404).json({ error: errors.ACTIVITY_NOT_FOUND.message, data: null });
-        }
-        let booking = activity.bookings.id(ObjectId(req.params.bookingId));
+      .then((booking) => {
+        console.log("here2");
         if (_.isEmpty(booking)) {
-          // No booking match
+          // No activity match
           return res.status(404).json({ error: errors.BOOKING_NOT_FOUND.message, data: null });
         }
-        
-        // Resource found
+        console.log(Object.keys(booking));
         return res.status(200).json({ error: null, data: booking });
-      });
-    // jwt.verify(req)
-    //   .then((token) => {
-    //     if (!token.isAdmin) {
+      })
+      .catch((error)=>{console.log(error)});
 
-    //       let activityId = ObjectId(req.params.activityId);
-    //       let bookingId = ObjectId(req.params.bookingId);
-          
-    //       Activity.findById(activityId).exec()
-    //       .then((activity)=>{
-            
-    //         let booking = activity.bookings.id(bookingId);
-    //         if(!!booking)
-    //           res.status(200).json({ error: null, data: booking});
-    //         else
-    //           res.status(404).json({ error: errors.BOOKING_NOT_FOUND.message, data: null})
-    //       })
-    //       .catch((error) => res.status(401).json({ error: error.message, data: null }))
-          
-    //     }
-    //     else
-    //       return res.status(403).json({ error: errors.NOT_BUSINESS.message, data: null });
-    //   })
-    //   .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }));
   });
 
   /** Edit own activity's confirmed booking (for business owners) */
 
   api.put('/activities/:activityId/bookings/:bookingId', (req, res) => {
-    jwt.verify(req)
-      .then((token) => {
-        if (!token.isAdmin) {
-          let activityId = ObjectId(req.params.activityId);
-          let bookingId = ObjectId(req.params.bookingId);
+    // Verify JWT validity
+    // jwt.verify(req)
+    //   // Invalid JWT
+    //   .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }))
+    //   // Get resource
+    //   .then(()=> db.updateActivityById(req.params.activityId, req.body))
+    //   // Couldn't get resource
+    //   .catch(() => res.status(500).json({ error: errors.INTERNAL_SERVER_ERROR.message, data: null }))
+    //   // Respond with resource
+    //   .then((activity) => {
+    //     if (_.isEmpty(activity)) {
+    //       // No activity match
+    //       return res.status(404).json({ error: errors.ACTIVITY_NOT_FOUND.message, data: null });
+    //     }
+    //     let booking = activity.bookings.id(req.params.bookingId));
+    //     if (_.isEmpty(booking)) {
+    //       // No booking match
+    //       return res.status(404).json({ error: errors.BOOKING_NOT_FOUND.message, data: null });
+    //     }
+        
+    //     // Resource found
+    //     return res.status(200).json({ error: null, data: booking });
+    //   });
+    
+    // jwt.verify(req)
+    //   .then((token) => {
+    //     if (!token.isAdmin) {
+    //       let activityId = ObjectId(req.params.activityId);
+    //       let bookingId = ObjectId(req.params.bookingId);
           
-          let set = Object.keys(req.body).reduce((acc, cur)=>{acc['bookings.$.' + cur] = req.body[cur]; return acc;}, {});
+    //       let set = Object.keys(req.body).reduce((acc, cur)=>{acc['bookings.$.' + cur] = req.body[cur]; return acc;}, {});
 
-          CheckActivityOwnerPromise(token.username,activityId)
-          .then(()=>{
-            Activity.update({_id: activityId, "bookings._id": bookingId},{$set: set})
-            .then((numAffected)=>{
-                res.status(200).json({ error: null, data: numAffected});
-            })
-            .catch((error) => res.status(401).json({ error: error.message, data: null }))
-          })
-          .catch((error) => res.status(403).json({ error: errors.UNAUTHORIZED.message, data: null }))
+    //       CheckActivityOwnerPromise(token.username,activityId)
+    //       .then(()=>{
+    //         Activity.update({_id: activityId, "bookings._id": bookingId},{$set: set})
+    //         .then((numAffected)=>{
+    //             res.status(200).json({ error: null, data: numAffected});
+    //         })
+    //         .catch((error) => res.status(401).json({ error: error.message, data: null }))
+    //       })
+    //       .catch((error) => res.status(403).json({ error: errors.UNAUTHORIZED.message, data: null }))
           
-        }
-        else
-          return res.status(403).json({ error: errors.NOT_BUSINESS.message, data: null });
+    //     }
+    //     else
+    //       return res.status(403).json({ error: errors.NOT_BUSINESS.message, data: null });
 
-      })
-      .catch((err) =>  res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }) );
+    //   })
+    //   .catch((err) =>  res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }) );
   });
 
   /** Delete own activity's confirmed booking (for business owners) */

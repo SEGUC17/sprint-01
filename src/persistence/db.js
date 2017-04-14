@@ -1,9 +1,13 @@
 import mongoose from 'mongoose';
+import _ from 'lodash';
+
 import config from '../constants/config';
 
 import User from './models/user';
 import Business from './models/business';
 import Activity from './models/activity';
+
+import errors from '../constants/errors'
 
 export default class Database {
   /** Construction, Connection & Destruction */
@@ -187,7 +191,7 @@ export default class Database {
     return Business.findOneAndRemove({ _id, isVerified: false }).exec();
   }
 
-  /** Activities Registrations */
+  /** Activities  */
   
   insertOneActivity(activity) {
     return Activity.create(business);
@@ -201,8 +205,8 @@ export default class Database {
     return Activity.count().exec();
   }
 
-  getAllActivitys() {
-    return Activity.find({ isVerified: false }).exec();
+  getAllActivities() {
+    return Activity.find().exec();
   }
 
   getActivityById(_id) {
@@ -214,11 +218,27 @@ export default class Database {
   }
 
   updateActivityById(_id, updates) {
-    return Activity.findOneAndUpdate({ _id, isVerified: false }, updates, { new: true }).exec();
+    return Activity.findOneAndUpdate(_id, updates, { new: true }).exec();
   }
 
   deleteActivityById(_id) {
     return Activity.findOneAndRemove({ _id, isVerified: false }).exec();
   }
+
+  /** Activities Booking  */
+
+  getActivityBookingById(activityId, bookingId) {
+    return new Promise((resolve, reject) => {
+      this.getActivityById(activityId)
+        .then((activity)=>{
+          
+          if (_.isEmpty(activity)) {
+            reject(errors.ACTIVITY_NOT_FOUND);
+          } 
+          resolve(activity.bookings.id(bookingId));
+        })
+      })
+  }
+
 
 }

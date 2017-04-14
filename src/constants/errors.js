@@ -1,21 +1,21 @@
 export default {
-  INVALID_TOKEN: new Error('Invalid token'),
-  UNAUTHORIZED: new Error('Unauthorized'),
+  INVALID_TOKEN: ('Invalid token'),
+  UNAUTHORIZED: ('Unauthorized'),
 
-  NOT_ADMIN: new Error('Not admin'),
-  NOT_CLIENT: new Error('Not client'),
-  NOT_BUSINESS: new Error('Not Business owner'),
+  NOT_ADMIN: ('Not admin'),
+  NOT_CLIENT: ('Not client'),
+  NOT_BUSINESS: ('Not Business owner'),
   
-  UNRIGHTFUL_BUSINESS_OWNER: new Error('Unrightful business owner'),
-  USERNAME_NOT_FOUND: new Error('Username not found'),
-  PASSWORD_MISMATCH: new Error('Password mismatch'),
+  UNRIGHTFUL_BUSINESS_OWNER: ('Unrightful business owner'),
+  USERNAME_NOT_FOUND: ('Username not found'),
+  PASSWORD_MISMATCH: ('Password mismatch'),
 
-  ENTITY_NOT_FOUND: new Error('Entity not found'),
-  BOOKING_NOT_FOUND: new Error('Booking not found'),
-  USER_NOT_FOUND: new Error('User not found'),
-  ACTIVITY_NOT_FOUND: new Error('Activity not found'),
-  BOOKING_NOT_FOUND: new Error('Booking not found'),
-  BUSINESS_NOT_FOUND: new Error('BUSINESS not found'),
+  ENTITY_NOT_FOUND: ('Entity not found'),
+  BOOKING_NOT_FOUND: ('Booking not found'),
+  USER_NOT_FOUND: ('User not found'),
+  ACTIVITY_NOT_FOUND: ('Activity not found'),
+  BOOKING_NOT_FOUND: ('Booking not found'),
+  BUSINESS_NOT_FOUND: ('BUSINESS not found'),
   
-  INTERNAL_SERVER_ERROR: new Error('Internal Server Error'),
+  INTERNAL_SERVER_ERROR: ('Internal Server Error'),
 };

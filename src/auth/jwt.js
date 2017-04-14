@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import config from '../constants/config';
+import errors from '../constants/errors'
 
 export default {
   sign: ({ username, isAdmin }) =>
