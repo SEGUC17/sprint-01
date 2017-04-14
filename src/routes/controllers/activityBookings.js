@@ -22,7 +22,7 @@ export default ({ api, db }) => {
     //get activity by id
     .then(()=> db.getActivityById(req.params.id))
     //get activity by id
-    .then((activity) => { return res.status(200).json({ error: null, data: activity.bookings })})
+    .then((activity) => { return res.status(200).json({ error: null, data: activity.bookings.filter((e)=>!e.isConfirmed) })})
     //return errors
     .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
   });
@@ -57,64 +57,47 @@ export default ({ api, db }) => {
       .then(() => { return res.status(200).json({ error: null, data: null })})
       .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
     
-    // jwt.verify(req)
-    //   .then((token) => {
-    //     if (!token.isAdmin) {
-
-    //       let activityId = ObjectId(req.params.activityId);
-    //       let bookingId = ObjectId(req.params.bookingId);
-          
-    //       CheckActivityOwnerPromise(token.username,activityId)
-    //       .then(()=>{
-    //         Activity.findById(activityId).exec()
-    //         .then((activity)=>{
-              
-    //           let booking = activity.bookings.id(bookingId)
-
-    //           activity.save()
-    //           .then((activity)=> res.status(200).json({ error: null, data: null}))
-    //           .catch((error) => res.status(401).json({ error: error, data: null }))
-
-    //         })
-    //         .catch((error) => res.status(401).json({ error: error.message, data: null }))
-    //       })
-    //       .catch((error) => res.status(403).json({ error: errors.UNAUTHORIZED.message, data: null }))
-          
-    //     }
-    //     else
-    //       return res.status(403).json({ error: errors.NOT_BUSINESS.message, data: null });
-    //   })
-    //   .catch(() => res.status(401).json({ error: errors.INVALID_TOKEN.message, data: null }));
   });
 
   /** List own activity's booking requests (for business owners) */
 
   api.get('/activities/:id/booking-requests', (req, res) => {
-    res.json({});
-  });
 
-  /** View own activity's booking request (for business owners) */
+    jwt.verify(req)
+    .then(()=> db.getActivityById(req.params.id))
+    .then((activity) => { return res.status(200).json({ error: null, data: activity.bookings.filter((e)=>e.isConfirmed) })})
+    .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
 
-  api.get('/activities/:activityId/booking-requests/:bookingId', (req, res) => {
-    res.json({});
   });
 
   /** Request an activity's booking (for clients) */
 
   api.post('/activities/:activityId/booking-requests', (req, res) => {
-    res.json({});
+    jwt.verify(req)
+      .then(()=> db.insertBooking(req.params.activityId, req.params.bookingId, req.body))
+      .then( (booking) => { return res.status(200).json({ error: null, data: booking})} )
+      .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
+
   });
 
   /** Confirm own activity's booking request (for business owners) */
 
   api.put('/activities/:activityId/booking-requests/:bookingId/verify', (req, res) => {
-    res.json({});
+    jwt.verify(req)
+      .then((token)=> db.updateActivityBookingById(token.username, req.params.activityId, req.params.bookingId, {isConfirmed:true}))
+      .then((activity) => { return res.status(200).json({ error: null, data: activity })})
+      .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
+    
   });
 
   /** Discard own activity's booking request (for business owners) */
 
   api.delete('/activities/:activityId/booking-requests/:bookingId/verify', (req, res) => {
-    res.json({});
+    jwt.verify(req)
+      .then((token)=> db.deleteActivityBookingById(token.username, req.params.activityId, req.params.bookingId, req.body))
+      .then((activity) => { return res.status(200).json({ error: null, data: activity })})
+      .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
+      
   });
 
   let CheckActivityOwnerPromise = (businessUserName, activityId)=>{    

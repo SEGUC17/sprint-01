@@ -53,7 +53,7 @@ const seed = (done) => {
 
     testData.activityDoc = { 
       name: 'testActivity',
-      isConfirmed: "true",
+      isConfirmed: true,
     }
     
     testData.businessDoc = _.omit(businessExamples[0],'_id');
@@ -256,4 +256,21 @@ describe('ActivityBooking', () => {
 
   });
 
+
+  describe('GET /activities/:id/booking-requests', () => {
+    it('should return correct data', (done) =>{      
+      chai.request(app)
+		    .get(`/api/activities/:id/booking-requests`)
+        .set('x-auth-token', testData.clientToken)
+		    .end((err, res) => {
+          console.log(res.body);
+			  	expect(res).to.have.status(200);
+			  	expect(res.body.error).to.be.null;
+			  	expect(res.body.data).to.be.an('array');
+			  	expect(res.body.data).to.be.of.length(1);
+		      done();
+      });
+
+    }); 
+  }); 
 });

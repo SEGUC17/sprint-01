@@ -290,13 +290,26 @@ export default class Database {
 
     })
   }
+
+  insertBooking (activityId, bookingId, bookingDoc) {
+    let bookingIndex;
+
+    return new Promise((resolve, reject) => {
+      this.getActivityById(activityId)
+      .then((activity)=>{
+        bookingIndex = activity.bookings.push(bookingDoc)-1;
+        return survey.save();
+      })
+      .then((activity)=>resolve(activity.bookings[bookingIndex]))
+      .catch((error)=> reject(error))
+    })
+    
+  }
   
   deleteActivityBookingById(username, activityId, bookingId, updates) {
     return new Promise((resolve, reject) => {
       this.getActivityById(activityId)
-        .then((activity)=>{
-          return this.isRightfulActivityOwner(username,activityId)
-        })
+        .then((activity)=> this.isRightfulActivityOwner(username,activityId) )
         .then(()=>this.getActivityById(activityId))
         .then((activity)=>{
           let booking = activity.bookings.id(bookingId);
