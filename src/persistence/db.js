@@ -57,6 +57,7 @@ export default class Database {
       .then(createdClient => this.obscureMongooseObjectPassword(createdClient));
   }
 
+
   insertClients(clients) {
     return User.create(clients.map(client => ({ ...client, isAdmin: false })))
       .then(createdClients => createdClients.map(this.obscureMongooseObjectPassword));
@@ -304,7 +305,7 @@ export default class Database {
     
   }
   
-  verifyBooking (username, activityId, bookingId) {
+  confirmBooking (username, activityId, bookingId) {
     
     return new Promise((resolve, reject) => {
       this.updateActivityBookingById(username, activityId, bookingId, {isConfirmed:true})
@@ -354,7 +355,7 @@ export default class Database {
 
   insertOneActivityType(activityType) {
     return new Promise((resolve, reject)=>{
-      ActivityType.create(_.extend(activityType, {isConfirmed:true}))
+      ActivityType.create(activityType)
       .then((activityType)=>resolve(activityType))
       .catch((error)=>reject(errors.BAD_REQUEST(error.message)))
     })
@@ -384,10 +385,32 @@ export default class Database {
   }
 
   updateActivityTypeById(_id, updates) {
-    return ActivityType.findOneAndUpdate(_id, updates, { new: true }).exec();
+    return new Promise((resolve, reject)=>{
+      ActivityType.findOneAndUpdate(_id, updates, { new: true }).exec()
+      .then((activityType)=>{
+        if (_.isEmpty(activityType))
+          reject(errors.ACTIVITY_NOT_FOUND);
+        else
+          resolve(activityType)
+      })
+
+    })
   }
 
-  deleteActivityTypeById(_id) {
-    return ActivityType.findOneAndRemove({ _id, isConfirmed: false }).exec();
+
+  deleteActivityTypeById(_id) { 
+    //@NOTE: you are not deleting all activities that have this type .. so this maybe problematic
+    return new Promise((resolve, reject)=>{
+      this.getActivityTypeById(_id)
+      .then(()=>ActivityType.findOneAndRemove({ _id}).exec())
+      .then((x)=>resolve(null))
+      .catch((error)=>reject(error))
+    }); 
   }
+
+
+  getAllActivityTypesRequests() {
+    return ActivityType.find({isConfirmed:false}).exec();
+  }
+
 }

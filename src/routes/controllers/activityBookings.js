@@ -84,7 +84,7 @@ export default ({ api, db }) => {
 
   api.put('/activities/:activityId/booking-requests/:bookingId/verify', (req, res) => {
     jwt.verify(req)
-      .then((token)=> db.verifyBooking(token.username, req.params.activityId, req.params.bookingId))
+      .then((token)=> db.confirmBooking(token.username, req.params.activityId, req.params.bookingId))
       .then((booking) => { return res.status(200).json({ error: null, data: booking })})
       .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
     
