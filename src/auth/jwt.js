@@ -17,7 +17,7 @@ export default {
 
   isAdmin: token => new Promise((resolve, reject) => {
     if (token.isAdmin) return resolve(token);
-    return reject();
+    return reject(errors.NOT_ADMIN);
   }),
 
   isClient: token => new Promise((resolve, reject) => {

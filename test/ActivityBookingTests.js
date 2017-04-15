@@ -41,7 +41,7 @@ const seed = (done) => {
 
     testData.userDoc = _.omit(clientExamples[0],'_id');
     testData.businessUserDoc = _.omit(clientExamples[1],'_id');
-
+    
     testData.clientToken = jwt.sign(testData.userDoc);
     testData.businessToken = jwt.sign(testData.businessUserDoc);
     testData.adminToken = jwt.sign({ username: 'admin', role: 'ADMIN' });

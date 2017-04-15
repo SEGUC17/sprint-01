@@ -19,7 +19,6 @@ const activityTypeSchema = mongoose.Schema({
   isConfirmed: {
     type: Boolean,
     required: true,
-    default: false,
   },
 });
 

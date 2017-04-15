@@ -6,6 +6,7 @@ import config from '../constants/config';
 import User from './models/user';
 import Business from './models/business';
 import Activity from './models/activity';
+import ActivityType from './models/activityType';
 
 import errors from '../constants/errors'
 
@@ -216,7 +217,7 @@ export default class Database {
   /** Activities  */
   
   insertOneActivity(activity) {
-    return Activity.create(business);
+    return Activity.create(activity);
   }
 
   insertActivities(activities) {
@@ -349,4 +350,44 @@ export default class Database {
     });
   }
 
+  /** Activities Types  */
+
+  insertOneActivityType(activityType) {
+    return new Promise((resolve, reject)=>{
+      ActivityType.create(_.extend(activityType, {isConfirmed:true}))
+      .then((activityType)=>resolve(activityType))
+      .catch((error)=>reject(errors.BAD_REQUEST(error.message)))
+    })
+    return 
+  }
+
+  getActivitiesCount() {
+    return ActivityType.count().exec();
+  }
+
+  getAllActivityTypes() {
+    return ActivityType.find({isConfirmed:true}).exec();
+  }
+
+  getActivityTypeById(_id) {
+    return new Promise((resolve, reject) => {
+      ActivityType.findById(_id).exec()
+        .then((activityType)=>{
+          
+          if (_.isEmpty(activityType)) {
+            reject(errors.ACTIVITY_TYPE_NOT_FOUND);
+          } 
+          resolve(activityType);
+        })
+        .catch(()=> reject(errors.INTERNAL_SERVER_ERROR));
+      })
+  }
+
+  updateActivityTypeById(_id, updates) {
+    return ActivityType.findOneAndUpdate(_id, updates, { new: true }).exec();
+  }
+
+  deleteActivityTypeById(_id) {
+    return ActivityType.findOneAndRemove({ _id, isConfirmed: false }).exec();
+  }
 }
