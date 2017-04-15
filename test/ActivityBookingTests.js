@@ -61,30 +61,26 @@ const seed = (done) => {
     new User(testData.userDoc).save()
     .then((user)=>{
       testData.userDoc = user;
-      testData.activityDoc.bookings = [{client:user._id}];
+      testData.activityDoc.bookings = [{client:user._id, isConfirmed:true}];
       return new User(testData.businessUserDoc).save();
     })
-    .catch((err)=>{return console.log(err.message)})
     .then((businessUser)=>{
       testData.businessUserDoc = businessUser;
       testData.businessDoc.owner = businessUser._id;
       
       return new ActivityType(testData.ActivityTypeDoc).save();  
     })
-    .catch((err)=>{console.log(err.message)})
     .then((activityType)=>{
       testData.activityDoc.activityType = activityType._id;
 
       return new Activity(testData.activityDoc).save(); 
     })
-    .catch((err)=>{console.log(err.message)})
     .then((activity)=>{
       testData.activityDoc = activity;
       testData.businessDoc.activities = [activity._id];
       testData.businessDoc.isVerified = true;
       return new Business(testData.businessDoc).save(); 
     })
-    .catch((err)=>{console.log(err.message)})
     .then((business)=>{
       testData.businessDoc = business;
       done();
@@ -174,12 +170,12 @@ describe('ActivityBooking', () => {
 		    .put(`/api/activities/${testData.activityDoc._id}/bookings/${testData.activityDoc.bookings[0]._id}`)
         .set('x-auth-token', testData.businessToken)
         .send({
-          isConfirmed: true
+          isConfirmed: false
         })
 		    .end((err, res) => {
 			  	expect(res).to.have.status(200);
 			  	expect(res.body.error).to.be.null;
-			  	expect(res.body.data.bookings[0].isConfirmed).to.be.true;
+			  	expect(res.body.data.isConfirmed).to.be.false;
 		      done();
       });
 
@@ -202,7 +198,7 @@ describe('ActivityBooking', () => {
     it('should ensure that the issuer is the business owner', (done) =>{
       chai.request(app)
 		    .put(`/api/activities/${testData.activityDoc._id}/bookings/${testData.activityDoc.bookings[0]._id}`)
-        .set('x-auth-token', jwt.sign({username:testData.userDoc.username, role:'BUSINESS'}))
+        .set('x-auth-token', testData.clientToken)
         .send({
           isConfirmed: true
         })
@@ -256,14 +252,34 @@ describe('ActivityBooking', () => {
 
   });
 
+  
+  describe('POST /activities/:activityId/booking-requests', () => {
+    it('should create new booking request', (done) =>{      
+      chai.request(app)
+		    .post(`/api/activities/${testData.activityDoc._id}/booking-requests`)
+        .set('x-auth-token', testData.clientToken)
+        .send({
+          client:testData.userDoc._id
+        })
+		    .end((err, res) => {
+          testData.bookingRequestId =  res.body.data._id;
+			  	expect(res).to.have.status(200);
+			  	expect(res.body.error).to.be.null;
+			  	expect(res.body.data).to.be.an('object');
+			  	expect(res.body.data.isConfirmed).to.be.false;
+			  	expect(res.body.data.client).to.equal(testData.userDoc._id.toString());
+		      done();
+      });
 
+    }); 
+  }); 
+  
   describe('GET /activities/:id/booking-requests', () => {
     it('should return correct data', (done) =>{      
       chai.request(app)
-		    .get(`/api/activities/:id/booking-requests`)
+		    .get(`/api/activities/${testData.activityDoc._id}/booking-requests`)
         .set('x-auth-token', testData.clientToken)
 		    .end((err, res) => {
-          console.log(res.body);
 			  	expect(res).to.have.status(200);
 			  	expect(res.body.error).to.be.null;
 			  	expect(res.body.data).to.be.an('array');
@@ -273,4 +289,68 @@ describe('ActivityBooking', () => {
 
     }); 
   }); 
+  
+  describe('PUT /activities/:activityId/booking-requests/:bookingId/verify', () => {
+    it('should update the booking request', (done) =>{      
+      chai.request(app)
+		    .put(`/api/activities/${testData.activityDoc._id}/booking-requests/${testData.bookingRequestId}/verify`)
+        .set('x-auth-token', testData.businessToken)
+		    .end((err, res) => {
+			  	expect(res).to.have.status(200);
+			  	expect(res.body.error).to.be.null;
+			  	expect(res.body.data).to.be.an('object');
+			  	expect(res.body.data.isConfirmed).to.be.true;
+		      done();
+      });
+
+    }); 
+    
+    it('should ensure that the issuer is the business owner', (done) =>{
+      chai.request(app)
+		    .put(`/api/activities/${testData.activityDoc._id}/booking-requests/${testData.bookingRequestId}/verify`)
+        .set('x-auth-token', testData.clientToken)
+		    .end((err, res) => {
+			  	expect(res).to.have.status(403);
+			  	expect(res.body.data).to.be.null;
+			  	expect(res.body.error).to.equal(errors.UNRIGHTFUL_ACTIVITY_OWNER.message);
+		      done();
+          
+      });
+    });
+
+  }); 
+  
+  describe('DELETE /activities/:activityId/booking-requests/:bookingId/verify', () => {
+    it('should delete booking', (done) =>{      
+      chai.request(app)
+		    .delete(`/api/activities/${testData.activityDoc._id}/booking-requests/${testData.bookingRequestId}/verify`)
+        .set('x-auth-token', testData.businessToken)
+		    .end((err, res) => {
+			  	expect(res).to.have.status(200);
+			  	expect(res.body.error).to.be.null;
+			  	expect(res.body.data).to.be.null;
+		      done();
+      });
+    });
+
+    it('should ensure that the issuer is the business owner', (done) =>{
+      chai.request(app)
+		    .delete(`/api/activities/${testData.activityDoc._id}/booking-requests/${testData.bookingRequestId}/verify`)
+        .set('x-auth-token', testData.clientToken)
+        .send({
+          isConfirmed: true
+        })
+		    .end((err, res) => {
+			  	expect(res).to.have.status(403);
+			  	expect(res.body.data).to.be.null;
+			  	expect(res.body.error).to.equal(errors.UNRIGHTFUL_ACTIVITY_OWNER.message);
+		      done();
+          
+      });
+    });
+
+  }); 
+
+
+
 });

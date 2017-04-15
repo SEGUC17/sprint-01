@@ -22,7 +22,7 @@ export default ({ api, db }) => {
     //get activity by id
     .then(()=> db.getActivityById(req.params.id))
     //get activity by id
-    .then((activity) => { return res.status(200).json({ error: null, data: activity.bookings.filter((e)=>!e.isConfirmed) })})
+    .then((activity) => { return res.status(200).json({ error: null, data: activity.bookings.filter((e)=>e.isConfirmed) })})
     //return errors
     .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
   });
@@ -65,7 +65,7 @@ export default ({ api, db }) => {
 
     jwt.verify(req)
     .then(()=> db.getActivityById(req.params.id))
-    .then((activity) => { return res.status(200).json({ error: null, data: activity.bookings.filter((e)=>e.isConfirmed) })})
+    .then((activity) => { return res.status(200).json({ error: null, data: activity.bookings.filter((e)=>!e.isConfirmed) })})
     .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
 
   });
@@ -74,7 +74,7 @@ export default ({ api, db }) => {
 
   api.post('/activities/:activityId/booking-requests', (req, res) => {
     jwt.verify(req)
-      .then(()=> db.insertBooking(req.params.activityId, req.params.bookingId, req.body))
+      .then(()=> db.insertBooking(req.params.activityId, req.body))
       .then( (booking) => { return res.status(200).json({ error: null, data: booking})} )
       .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
 
@@ -84,8 +84,8 @@ export default ({ api, db }) => {
 
   api.put('/activities/:activityId/booking-requests/:bookingId/verify', (req, res) => {
     jwt.verify(req)
-      .then((token)=> db.updateActivityBookingById(token.username, req.params.activityId, req.params.bookingId, {isConfirmed:true}))
-      .then((activity) => { return res.status(200).json({ error: null, data: activity })})
+      .then((token)=> db.verifyBooking(token.username, req.params.activityId, req.params.bookingId))
+      .then((booking) => { return res.status(200).json({ error: null, data: booking })})
       .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
     
   });
@@ -95,9 +95,9 @@ export default ({ api, db }) => {
   api.delete('/activities/:activityId/booking-requests/:bookingId/verify', (req, res) => {
     jwt.verify(req)
       .then((token)=> db.deleteActivityBookingById(token.username, req.params.activityId, req.params.bookingId, req.body))
-      .then((activity) => { return res.status(200).json({ error: null, data: activity })})
+      .then(() => { return res.status(200).json({ error: null, data: null })})
       .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
-      
+       
   });
 
   let CheckActivityOwnerPromise = (businessUserName, activityId)=>{    

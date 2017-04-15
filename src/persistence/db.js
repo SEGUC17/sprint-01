@@ -241,7 +241,7 @@ export default class Database {
           } 
           resolve(activity);
         })
-        .catch(()=> errors.INTERNAL_SERVER_ERROR);
+        .catch(()=> reject(errors.INTERNAL_SERVER_ERROR));
       })
   }
 
@@ -276,13 +276,11 @@ export default class Database {
   updateActivityBookingById(username, activityId, bookingId, updates) {
     return new Promise((resolve, reject) => {
       this.getActivityById(activityId)
-        .then((activity)=>{
-          return this.isRightfulActivityOwner(username,activityId)
-        })      
+        .then((activity)=>this.isRightfulActivityOwner(username,activityId))      
         .then(()=>{
           let set = Object.keys(updates).reduce((acc, cur)=>{acc['bookings.$.' + cur] = updates[cur]; return acc;}, {});
           Activity.findOneAndUpdate({_id: activityId, "bookings._id": bookingId}, {$set:set}, {new: true}).exec()
-          .then((activity)=> resolve(activity))
+          .then((activity)=> resolve(activity.bookings.id(bookingId)))
           .catch((errors)=> reject(errors.INTERNAL_SERVER_ERROR));
 
         })
@@ -291,16 +289,25 @@ export default class Database {
     })
   }
 
-  insertBooking (activityId, bookingId, bookingDoc) {
+  insertBooking (activityId, bookingDoc) {
     let bookingIndex;
-
     return new Promise((resolve, reject) => {
       this.getActivityById(activityId)
       .then((activity)=>{
         bookingIndex = activity.bookings.push(bookingDoc)-1;
-        return survey.save();
+        return activity.save();
       })
       .then((activity)=>resolve(activity.bookings[bookingIndex]))
+      .catch((error)=> reject(error))
+    })
+    
+  }
+  
+  verifyBooking (username, activityId, bookingId) {
+    
+    return new Promise((resolve, reject) => {
+      this.updateActivityBookingById(username, activityId, bookingId, {isConfirmed:true})
+      .then((booking)=>resolve(booking))
       .catch((error)=> reject(error))
     })
     
