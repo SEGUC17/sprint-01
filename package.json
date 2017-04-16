@@ -5,7 +5,7 @@
   "main": "src/app.js",
   "scripts": {
     "start": "nodemon src/app.js --exec babel-node",
-    "test": "mocha --timeout 15000 --compilers js:babel-core/register --recursive test"
+    "test": "NODE_ENV=TEST; mocha --timeout 15000 --compilers js:babel-core/register --recursive test"
   },
   "author": "SE 2017 Team",
   "license": "ISC",

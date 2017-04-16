@@ -10,7 +10,7 @@ import Activity from './models/activity';
 import ActivityType from './models/activityType';
 
 
-import errors from '../constants/errors'
+import errors from '../constants/errors';
 
 
 export default class Database {
@@ -38,43 +38,41 @@ export default class Database {
 
   /** Users */
 
-  getUserByUsername(username ) {
-    return new Promise((resolve, reject)=>{
+  getUserByUsername(username) {
+    return new Promise((resolve, reject) => {
       User.findOne({ username }).exec()
-      .then((user)=>{
-        if(_.isEmpty(user)) 
+      .then((user) => {
+        if (_.isEmpty(user)) {
           reject(errors.USER_NOT_FOUND);
-        
+        }
+
         resolve(user);
       })
-      .catch((err)=> reject(errors.INTERNAL_SERVER_ERROR) )
-
-    })
+      .catch(() => reject(errors.INTERNAL_SERVER_ERROR));
+    });
   }
-  
-  validateUserPassword(username, password ) {
-    return new Promise((resolve, reject)=>{
+
+  validateUserPassword(username, password) {
+    return new Promise((resolve, reject) => {
       this.getUserByUsername(username)
       .then((user) => {
-
         if (!bcrypt.compare(password, user.password)) {
           return reject(errors.PASSWORD_MISMATCH);
         }
         return resolve(user);
       })
-      .catch((error)=>reject(error))
-
-    })
+      .catch(error => reject(error));
+    });
   }
 
   /** Clients */
 
   insertOneClient(client) {
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
       User.create({ ...client, isAdmin: false })
       .then(createdClient => resolve(this.obscureMongooseObjectPassword(createdClient)))
-      .catch(error=>reject(errors.BAD_REQUEST(errors.message)))
-    })
+      .catch(error => reject(errors.BAD_REQUEST(error.message)));
+    });
   }
 
 
@@ -110,11 +108,11 @@ export default class Database {
   /** Admins */
 
   insertOneAdmin(admin) {
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
       User.create({ ...admin, isAdmin: true })
       .then(createdAdmin => resolve(this.obscureMongooseObjectPassword(createdAdmin)))
-      .catch(error=>reject(errors.BAD_REQUEST(errors.message)))
-    })
+      .catch(error => reject(errors.BAD_REQUEST(error.message)));
+    });
   }
 
   insertAdmins(admins) {
@@ -145,17 +143,15 @@ export default class Database {
   deleteAdminById(_id) {
     return User.findOneAndRemove({ _id, isAdmin: true }).select('-password').exec();
   }
-  
-  isBusinessOwner(username) {
-    return new Promise((resolve, reject)=>{
-      this.getBusinessByOwnerUsername(username)
-      .then((business)=> resolve(business))
-      .catch(()=>reject(errors.NOT_BUSINESS))
 
-    }) 
+  isBusinessOwner(username) {
+    return new Promise((resolve, reject) => {
+      this.getBusinessByOwnerUsername(username)
+      .then(business => resolve(business))
+      .catch(() => reject(errors.NOT_BUSINESS));
+    });
   }
 
-  NOT_BUSINESS
 
   /** Businesses */
 
@@ -176,49 +172,46 @@ export default class Database {
   }
 
   getBusinessById(_id) {
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
       Business.findOne({ _id, isVerified: true }).exec()
-      .then((business)=>{
-        if(_.isEmpty(business))
+      .then((business) => {
+        if (_.isEmpty(business)) {
           return reject(errors.BUSINESS_NOT_FOUND);
-        resolve(business);
+        }
+        return resolve(business);
       })
-      .catch((error)=>reject(errors.BAD_REQUEST(error.message)))
-
-    }) 
+      .catch(error => reject(errors.BAD_REQUEST(error.message)));
+    });
   }
+
   getBusinessByOwnerId(_id) {
-    
-    return new Promise((resolve, reject)=>{
-      Business.findOne({ owner:_id, isVerified: true }).exec()
-      .then((business)=>{
-        if(_.isEmpty(business))
+    return new Promise((resolve, reject) => {
+      Business.findOne({ owner: _id, isVerified: true }).exec()
+      .then((business) => {
+        if (_.isEmpty(business)) {
           return reject(errors.BUSINESS_NOT_FOUND);
-        resolve(business);
+        }
+        return resolve(business);
       })
-      .catch((error)=>reject(errors.BAD_REQUEST(error.message)))
-
-    }) 
+      .catch(error => reject(errors.BAD_REQUEST(error.message)));
+    });
   }
-  
+
   getBusinessByOwnerUsername(username) {
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
       this.getUserByUsername(username)
-      .then((user)=>this.getBusinessByOwnerId(user._id))
-      .then((business)=>resolve(business))
-      .catch((error)=>reject(error))
-    })
+      .then(user => this.getBusinessByOwnerId(user._id))
+      .then(business => resolve(business))
+      .catch(error => reject(error));
+    });
   }
-  
+
   getBusinessOfActivity(activityId) {
-
-    return new Promise((resolve, reject)=>{
-      Business.findOne({ activities:activityId, isVerified: true}).exec()
-      .then((business)=>{
-          resolve(business);
-
-      })
-    })
+    return new Promise((resolve, reject) => {
+      Business.findOne({ activities: activityId, isVerified: true }).exec()
+      .then(business => resolve(business))
+      .catch(error => reject(error));
+    });
   }
 
   searchBusinesses(query) {
@@ -230,17 +223,19 @@ export default class Database {
   }
 
   addActivityToBusiness(businessId, activityId) {
-    return new Promise((resolve, reject)=>{
-      Business.findOneAndUpdate({ _id:businessId, isVerified: true }, { $push: { 'activities':activityId} }, { new: true }).exec()
-      .then((business)=>{
-        if(_.isEmpty(business))
-          reject(errors.USER_NOT_FOUND)
-        
-        resolve(business)
-      })
-      .catch((error)=> reject(error))
+    return new Promise((resolve, reject) => {
+      Business.findOneAndUpdate(
+        { _id: businessId, isVerified: true },
+        { $push: { activities: activityId } },
+        { new: true },
+      ).exec()
+      .then((business) => {
+        if (_.isEmpty(business)) reject(errors.USER_NOT_FOUND);
 
-    })
+        return resolve(business);
+      })
+      .catch(error => reject(error));
+    });
   }
 
   deleteBusinessById(_id) {
@@ -248,20 +243,18 @@ export default class Database {
   }
 
   isRightfulBusinessOwner(username, businessId) {
-    let userId; 
+    let userId;
     return new Promise((resolve, reject) => {
       this.getUserByUsername(username)
-      .then((user)=>{
-        userId = user._id
-        return getBusinessByOwnerId(userId);
+      .then((user) => {
+        userId = user._id;
+        return this.getBusinessByOwnerId(userId);
       })
-      .then((business)=>{
+      .then((business) => {
+        if (businessId.toString === business._id.toString()) return resolve();
 
-        if (userId.toString() === business.owner.toString()) 
-          return resolve();
-        
         return reject(errors.UNRIGHTFUL_BUSINESS_OWNER);
-      })
+      });
     });
   }
 
@@ -300,21 +293,18 @@ export default class Database {
   }
 
   /** Activities  */
-  
-  insertOneActivity(activity, businessId) {
-    let activityDoc; 
-    return new Promise((resolve, reject)=>{
-      Activity.create(activity)
-      .then((activity)=>{
-        activityDoc = activity; 
-        return this.addActivityToBusiness(businessId, activity._id)
-      })
-      .then((business)=>{
-        resolve(activityDoc);
-      })
-      .catch((error)=>reject(errors.BAD_REQUEST(error.errors)))
 
-    })
+  insertOneActivity(activity, businessId) {
+    let createdActivity;
+    return new Promise((resolve, reject) => {
+      Activity.create(activity)
+      .then((activityDoc) => {
+        createdActivity = activityDoc;
+        return this.addActivityToBusiness(businessId, createdActivity._id);
+      })
+      .then(() => { resolve(createdActivity); })
+      .catch(error => reject(errors.BAD_REQUEST(error.errors)));
+    });
   }
 
   insertActivities(activities) {
@@ -332,46 +322,43 @@ export default class Database {
   getActivityById(_id) {
     return new Promise((resolve, reject) => {
       Activity.findById(_id).exec()
-        .then((activity)=>{
-          
+        .then((activity) => {
           if (_.isEmpty(activity)) {
             reject(errors.ACTIVITY_NOT_FOUND);
-          } 
+          }
           resolve(activity);
         })
-        .catch(()=> reject(errors.INTERNAL_SERVER_ERROR));
-      })
+        .catch(() => reject(errors.INTERNAL_SERVER_ERROR));
+    });
   }
 
   searchActivities(query) {
     return new Promise((resolve, reject) => {
-      Activity.find({name: { $regex: new RegExp(query, 'i') }}).exec()
-      .then((activities)=> resolve(activities))
-      .catch(()=>reject(errors.INTERNAL_SERVER_ERROR))
+      Activity.find({ name: { $regex: new RegExp(query, 'i') } }).exec()
+      .then(activities => resolve(activities))
+      .catch(() => reject(errors.INTERNAL_SERVER_ERROR));
     });
   }
 
   updateActivityById(_id, updates) {
     return new Promise((resolve, reject) => {
       Activity.findOneAndUpdate(_id, updates, { new: true }).exec()
-      .then((activity)=>{
-        if(_.isEmpty(activity))
-          reject(errors.ACTIVITY_NOT_FOUND);
-        resolve(activity)
+      .then((activity) => {
+        if (_.isEmpty(activity)) reject(errors.ACTIVITY_NOT_FOUND);
+        resolve(activity);
       })
-      .catch(()=>reject(errors.INTERNAL_SERVER_ERROR))
-    })
+      .catch(() => reject(errors.INTERNAL_SERVER_ERROR));
+    });
   }
 
   deleteActivityById(_id) {
     return new Promise((resolve, reject) => {
-      Activity.findOneAndRemove({ _id}).exec()
-      .then((activity)=>{
-        if(_.isEmpty(activity))
-          reject(errors.ACTIVITY_NOT_FOUND);
-        resolve(null)
+      Activity.findOneAndRemove({ _id }).exec()
+      .then((activity) => {
+        if (_.isEmpty(activity)) reject(errors.ACTIVITY_NOT_FOUND);
+        resolve(null);
       })
-      .catch(()=>reject(errors.INTERNAL_SERVER_ERROR))
+      .catch(() => reject(errors.INTERNAL_SERVER_ERROR));
     });
   }
 
@@ -380,155 +367,146 @@ export default class Database {
   getActivityBookingById(activityId, bookingId) {
     return new Promise((resolve, reject) => {
       this.getActivityById(activityId)
-      .then((activity)=>{
-        let booking = activity.bookings.id(bookingId);
+      .then((activity) => {
+        const booking = activity.bookings.id(bookingId);
         if (_.isEmpty(booking)) {
           reject(errors.BOOKING_NOT_FOUND);
-        } 
+        }
         resolve(booking);
       })
-      .catch((error)=> reject(error))
-      })      
+      .catch(error => reject(error));
+    });
   }
 
   updateActivityBookingById(activityId, bookingId, updates) {
     return new Promise((resolve, reject) => {
       this.getActivityById(activityId)
-        .then(()=>{
-          let set = Object.keys(updates).reduce((acc, cur)=>{acc['bookings.$.' + cur] = updates[cur]; return acc;}, {});
-          Activity.findOneAndUpdate({_id: activityId, "bookings._id": bookingId}, {$set:set}, {new: true}).exec()
-          .then((activity)=> resolve(activity.bookings.id(bookingId)))
-          .catch((errors)=> reject(errors.INTERNAL_SERVER_ERROR));
-
+        .then(() => {
+          const set = Object.keys(updates).reduce((acc, cur) => ({ ...acc, [`bookings.$.${cur}`]: updates[cur] }), {});
+          Activity.findOneAndUpdate({ _id: activityId, 'bookings._id': bookingId }, { $set: set }, { new: true }).exec()
+          .then((activity) => {
+            if (_.isEmpty(activity)) reject(errors.ACTIVITY_NOT_FOUND);
+            const booking = activity.bookings.id(bookingId);
+            if (_.isEmpty(booking)) reject(errors.BOOKING_NOT_FOUND);
+            resolve(booking);
+          })
+          .catch(() => reject(errors.INTERNAL_SERVER_ERROR));
         })
-        .catch((error)=> reject(error) )
-
-    })
+        .catch(error => reject(error));
+    });
   }
 
-  insertBooking (activityId, bookingDoc) {
+  insertBooking(activityId, bookingDoc) {
     let bookingIndex;
     return new Promise((resolve, reject) => {
       this.getActivityById(activityId)
-      .then((activity)=>{
-        bookingIndex = activity.bookings.push(bookingDoc)-1;
+      .then((activity) => {
+        bookingIndex = activity.bookings.push(bookingDoc) - 1;
         return activity.save();
       })
-      .then((activity)=>resolve(activity.bookings[bookingIndex]))
-      .catch((error)=> reject(error))
-    })
-    
+      .then(activity => resolve(activity.bookings[bookingIndex]))
+      .catch(error => reject(error));
+    });
   }
-  
-  confirmBooking (activityId, bookingId) {
-    
+
+  confirmBooking(activityId, bookingId) {
     return new Promise((resolve, reject) => {
-      this.updateActivityBookingById(activityId, bookingId, {isConfirmed:true})
-      .then((booking)=>resolve(booking))
-      .catch((error)=> reject(error))
-    })
-    
+      this.updateActivityBookingById(activityId, bookingId, { isConfirmed: true })
+      .then(booking => resolve(booking))
+      .catch(error => reject(error));
+    });
   }
-  
+
   deleteActivityBookingById(activityId, bookingId) {
     return new Promise((resolve, reject) => {
       this.getActivityById(activityId)
-        .then(()=>this.getActivityById(activityId))
-        .then((activity)=>{
-          let booking = activity.bookings.id(bookingId);
-          if(_.isEmpty(booking)) reject(errors.BOOKING_NOT_FOUND);
+        .then(() => this.getActivityById(activityId))
+        .then((activity) => {
+          const booking = activity.bookings.id(bookingId);
+          if (_.isEmpty(booking)) reject(errors.BOOKING_NOT_FOUND);
           booking.remove();
           return activity.save();
         })
-        .then( (activity)=> resolve() )
-        .catch( (error)=> reject(error) )
-
-    })
+        .then(() => resolve())
+        .catch(error => reject(error));
+    });
   }
 
   isRightfulActivityOwner(username, activityId) {
     let activityBusiness;
     return new Promise((resolve, reject) => {
       this.getBusinessOfActivity(activityId)
-      .then((business)=> {
+      .then((business) => {
         activityBusiness = business;
         return this.getUserByUsername(username);
       })
-      .then((user)=>{
-        if(activityBusiness.owner.toString() === user._id.toString())
-          resolve();
-        reject(errors.UNRIGHTFUL_ACTIVITY_OWNER);
+      .then((user) => {
+        if (activityBusiness.owner.toString() === user._id.toString()) return resolve();
+        return reject(errors.UNRIGHTFUL_ACTIVITY_OWNER);
       })
 
-      .catch((error)=>reject(errors.UNRIGHTFUL_ACTIVITY_OWNER));
-
+      .catch(() => reject(errors.UNRIGHTFUL_ACTIVITY_OWNER));
     });
   }
 
   /** Activities Types  */
 
   insertOneActivityType(activityType) {
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
       ActivityType.create(activityType)
-      .then((activityType)=>resolve(activityType))
-      .catch((error)=>reject(errors.BAD_REQUEST(error.message)))
-    })
-    return 
+      .then(activityTypeDoc => resolve(activityTypeDoc))
+      .catch(error => reject(errors.BAD_REQUEST(error.message)));
+    });
   }
 
-  getActivitiesCount() {
+  getActivitiesTypesCount() {
     return ActivityType.count().exec();
   }
 
   getAllActivityTypes() {
-    return ActivityType.find({isConfirmed:true}).exec();
+    return ActivityType.find({ isConfirmed: true }).exec();
   }
 
   getActivityTypeById(_id) {
     return new Promise((resolve, reject) => {
       ActivityType.findById(_id).exec()
-        .then((activityType)=>{
-          
+        .then((activityType) => {
           if (_.isEmpty(activityType)) {
             reject(errors.ACTIVITY_TYPE_NOT_FOUND);
-          } 
+          }
           resolve(activityType);
         })
-        .catch(()=> reject(errors.INTERNAL_SERVER_ERROR));
-      })
+        .catch(() => reject(errors.INTERNAL_SERVER_ERROR));
+    });
   }
 
   updateActivityTypeById(_id, updates) {
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
       ActivityType.findOneAndUpdate(_id, updates, { new: true }).exec()
-      .then((activityType)=>{
-        if (_.isEmpty(activityType))
-          reject(errors.ACTIVITY_NOT_FOUND);
-        else
-          resolve(activityType)
-      })
-
-    })
+      .then((activityType) => {
+        if (_.isEmpty(activityType)) return reject(errors.ACTIVITY_NOT_FOUND);
+        return resolve(activityType);
+      });
+    });
   }
 
 
-  deleteActivityTypeById(_id) { 
-    //@NOTE: you are not deleting all activities that have this type .. so this maybe problematic
-    return new Promise((resolve, reject)=>{
+  deleteActivityTypeById(_id) {
+    // @NOTE: you are not deleting all activities that have this type .. so this maybe problematic
+    return new Promise((resolve, reject) => {
       this.getActivityTypeById(_id)
-      .then(()=>ActivityType.findOneAndRemove({ _id}).exec())
-      .then((activityType)=>{
-        if(_.isEmpty(activityType))
-          reject(errors.ACTIVITY_NOT_FOUND);
-        resolve(null)
+      .then(() => ActivityType.findOneAndRemove({ _id }).exec())
+      .then((activityType) => {
+        if (_.isEmpty(activityType)) return reject(errors.ACTIVITY_NOT_FOUND);
+        return resolve(null);
       })
-      .catch((error)=>reject(error))
-    }); 
+      .catch(error => reject(error));
+    });
   }
 
 
   getAllActivityTypesRequests() {
-    return ActivityType.find({isConfirmed:false}).exec();
+    return ActivityType.find({ isConfirmed: false }).exec();
   }
 
 }
