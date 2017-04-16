@@ -368,10 +368,9 @@ export default class Database {
       })      
   }
 
-  updateActivityBookingById(username, activityId, bookingId, updates) {
+  updateActivityBookingById(activityId, bookingId, updates) {
     return new Promise((resolve, reject) => {
       this.getActivityById(activityId)
-        .then((activity)=>this.isRightfulActivityOwner(username,activityId))      
         .then(()=>{
           let set = Object.keys(updates).reduce((acc, cur)=>{acc['bookings.$.' + cur] = updates[cur]; return acc;}, {});
           Activity.findOneAndUpdate({_id: activityId, "bookings._id": bookingId}, {$set:set}, {new: true}).exec()
@@ -398,20 +397,19 @@ export default class Database {
     
   }
   
-  confirmBooking (username, activityId, bookingId) {
+  confirmBooking (activityId, bookingId) {
     
     return new Promise((resolve, reject) => {
-      this.updateActivityBookingById(username, activityId, bookingId, {isConfirmed:true})
+      this.updateActivityBookingById(activityId, bookingId, {isConfirmed:true})
       .then((booking)=>resolve(booking))
       .catch((error)=> reject(error))
     })
     
   }
   
-  deleteActivityBookingById(username, activityId, bookingId, updates) {
+  deleteActivityBookingById(activityId, bookingId) {
     return new Promise((resolve, reject) => {
       this.getActivityById(activityId)
-        .then((activity)=> this.isRightfulActivityOwner(username,activityId) )
         .then(()=>this.getActivityById(activityId))
         .then((activity)=>{
           let booking = activity.bookings.id(bookingId);

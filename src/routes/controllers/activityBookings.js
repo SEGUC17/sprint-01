@@ -43,7 +43,8 @@ export default ({ api, db }) => {
   api.put('/activities/:activityId/bookings/:bookingId', (req, res) => {
     // Verify JWT validity
     jwt.verify(req)
-      .then((token)=> db.updateActivityBookingById(token.username, req.params.activityId, req.params.bookingId, req.body))
+      .then((token)=> db.isRightfulActivityOwner(token.username,req.params.activityId) )
+      .then(()=> db.updateActivityBookingById(req.params.activityId, req.params.bookingId, req.body))
       .then((activity) => { return res.status(200).json({ error: null, data: activity })})
       .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
     
@@ -53,7 +54,8 @@ export default ({ api, db }) => {
 
   api.delete('/activities/:activityId/bookings/:bookingId', (req, res) => {
     jwt.verify(req)
-      .then((token)=> db.deleteActivityBookingById(token.username, req.params.activityId, req.params.bookingId, req.body))
+      .then((token)=> db.isRightfulActivityOwner(token.username,req.params.activityId) )
+      .then(()=> db.deleteActivityBookingById(req.params.activityId, req.params.bookingId, req.body))
       .then(() => { return res.status(200).json({ error: null, data: null })})
       .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
     
@@ -84,7 +86,8 @@ export default ({ api, db }) => {
 
   api.put('/activities/:activityId/booking-requests/:bookingId/verify', (req, res) => {
     jwt.verify(req)
-      .then((token)=> db.confirmBooking(token.username, req.params.activityId, req.params.bookingId))
+      .then((token)=> db.isRightfulActivityOwner(token.username,req.params.activityId) )
+      .then(()=> db.confirmBooking(req.params.activityId, req.params.bookingId))
       .then((booking) => { return res.status(200).json({ error: null, data: booking })})
       .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
     
@@ -94,23 +97,12 @@ export default ({ api, db }) => {
 
   api.delete('/activities/:activityId/booking-requests/:bookingId/verify', (req, res) => {
     jwt.verify(req)
-      .then((token)=> db.deleteActivityBookingById(token.username, req.params.activityId, req.params.bookingId, req.body))
+      .then((token)=> db.isRightfulActivityOwner(token.username,req.params.activityId) )
+      .then(()=> db.deleteActivityBookingById(req.params.activityId, req.params.bookingId))
       .then(() => { return res.status(200).json({ error: null, data: null })})
       .catch((error)=>{ return res.status(error.status).json({ error: error.message, data: null }) })
        
   });
 
-  let CheckActivityOwnerPromise = (businessUserName, activityId)=>{    
-    return User.findOne({username:businessUserName}).exec()
-    .then(user=> Business.findOne({owner:user._id}))
-    .then(business=> {
-      return new Promise((resolve, reject)=>{
-        if(business.activites.indexOf(activityId) != -1)
-          resolve();
-        else
-          reject();
-      })
-    })
-
-  }
+  
 };

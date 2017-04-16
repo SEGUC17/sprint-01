@@ -291,7 +291,7 @@ describe('Activity', () => {
 
     });
     
-    it('should create document bookings', (done) =>{  
+    it('should delete document bookings', (done) =>{  
       chai.request(app)
 		    .delete(`/api/activities/${testData.activityDoc._id}`)
         .set('x-auth-token', testData.businessToken)
@@ -300,6 +300,7 @@ describe('Activity', () => {
 			  	expect(res.body.error).to.be.null;
 			  	expect(res.body.data).to.be.null;
 		      done();
+          
       });
 
     });

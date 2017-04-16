@@ -214,7 +214,7 @@ describe('ActivityBooking', () => {
   });
 
   describe('DELETE /activities/:activityId/bookings/:bookingId', () => {
-    it('should delete the right Id', (done) =>{
+    it('should delete the right booking', (done) =>{
       chai.request(app)
 		    .delete(`/api/activities/${testData.activityDoc._id}/bookings/${testData.activityDoc.bookings[0]._id}`)
         .set('x-auth-token', testData.businessToken)
@@ -275,7 +275,7 @@ describe('ActivityBooking', () => {
   }); 
   
   describe('GET /activities/:id/booking-requests', () => {
-    it('should return correct data', (done) =>{      
+    it('should return correct booking request', (done) =>{      
       chai.request(app)
 		    .get(`/api/activities/${testData.activityDoc._id}/booking-requests`)
         .set('x-auth-token', testData.clientToken)
