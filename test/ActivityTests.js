@@ -95,7 +95,7 @@ describe('Activity', () => {
   before(seed); 
 
   describe('GET /activities', () => {
-    it('should return correct data', (done) =>{      
+    it('should return all activities', (done) =>{      
       chai.request(app)
 		    .get(`/api/activities`)
         .set('x-auth-token', testData.clientToken)        
@@ -112,7 +112,7 @@ describe('Activity', () => {
   });
   
   describe('GET /activities/search', () => {
-    it('should return correct data if a correct name was used', (done) =>{
+    it('should return matching activities if a correct name was used', (done) =>{
       chai.request(app)
 		    .get(`/api/activities/search?name=testactivity`)		    
         .set('x-auth-token', testData.clientToken)
@@ -127,7 +127,7 @@ describe('Activity', () => {
 
     });
     
-    it('should return correct data if a part of the name was used', (done) =>{
+    it('should return matching activities if a part of the name was used', (done) =>{
       chai.request(app)
 		    .get(`/api/activities/search?name=st`)
         .set('x-auth-token', testData.clientToken)        
@@ -142,7 +142,7 @@ describe('Activity', () => {
 
     });
 
-    it('should return empty data if no matching names in activites', (done) =>{
+    it('should return empty array if no matching names in activities', (done) =>{
       chai.request(app)
 		    .get(`/api/activities/search?name=xyz`)
         .set('x-auth-token', testData.clientToken)        
@@ -158,7 +158,7 @@ describe('Activity', () => {
   });
 
   describe('GET /activities/:id', () => {
-    it('should return correct data if activity exists', (done) =>{  
+    it('should return activity with certain Id', (done) =>{  
 
       chai.request(app)
 		    .get(`/api/activities/${testData.activityDoc._id}`)
@@ -190,6 +190,28 @@ describe('Activity', () => {
   });
 
   describe('POST /activities', () => {
+    
+    it('should create activity', (done) =>{  
+      chai.request(app)
+		    .post(`/api/activities`)
+        .set('x-auth-token', testData.businessToken)
+        .send({ 
+          name: 'testActivity2',
+          isConfirmed: true,
+          activityType: testData.activityDoc.activityType
+        })
+		    .end((err, res) => {
+			  	expect(res).to.have.status(200);
+			  	expect(res.body.error).to.be.null;
+			  	expect(res.body.data.name).to.equal("testActivity2");
+          
+          testData.activityDoc = res.body.data;
+		      
+          done();
+      });
+
+    });
+    
     it('should verify token', (done) =>{  
       chai.request(app)
 		    .post(`/api/activities`)
@@ -217,31 +239,26 @@ describe('Activity', () => {
 
     });
     
-    it('should create document bookings', (done) =>{  
-      chai.request(app)
-		    .post(`/api/activities`)
-        .set('x-auth-token', testData.businessToken)
-        .send({ 
-          name: 'testActivity2',
-          isConfirmed: true,
-          activityType: testData.activityDoc.activityType
-        })
-		    .end((err, res) => {
-			  	expect(res).to.have.status(200);
-			  	expect(res.body.error).to.be.null;
-			  	expect(res.body.data.name).to.equal("testActivity2");
-          
-          testData.activityDoc = res.body.data;
-		      
-          done();
-      });
-
-    });
   });
 
   describe('PUT /activities/:id', () => {
 
-    
+    it('should uupdate activity with certain Id', (done) =>{  
+      chai.request(app)
+		    .put(`/api/activities/${testData.activityDoc._id}`)
+        .set('x-auth-token', testData.businessToken)
+        .send({
+          name:'testActivity3'
+        })
+		    .end((err, res) => {
+			  	expect(res).to.have.status(200);
+			  	expect(res.body.error).to.be.null;
+			  	expect(res.body.data.name).to.equal("testActivity3");
+		      done();
+      });
+
+    });
+
     it('should ensure that the issuer role is activity owner', (done) =>{  
       chai.request(app)
 		    .put(`/api/activities/${testData.activityDoc._id}`)
@@ -258,25 +275,9 @@ describe('Activity', () => {
 
     });
     
-    it('should create document bookings', (done) =>{  
-      chai.request(app)
-		    .put(`/api/activities/${testData.activityDoc._id}`)
-        .set('x-auth-token', testData.businessToken)
-        .send({
-          name:'testActivity3'
-        })
-		    .end((err, res) => {
-			  	expect(res).to.have.status(200);
-			  	expect(res.body.error).to.be.null;
-			  	expect(res.body.data.name).to.equal("testActivity3");
-		      done();
-      });
-
-    });
   });
   
   describe('DELETE /activities/:id', () => {
-
     
     it('should ensure that the issuer role is activity owner', (done) =>{  
       chai.request(app)
@@ -304,6 +305,7 @@ describe('Activity', () => {
       });
 
     });
+    
   });
 
   

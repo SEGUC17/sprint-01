@@ -74,7 +74,7 @@ describe('ActivityTypes', () => {
       });
     });
 
-    it('should ensure only an admin can access it ', (done) =>{      
+    it('should ensure only an admin can create activityTypes ', (done) =>{      
       chai.request(app)
 		    .post(`/api/activity-types`)
         .send({
@@ -113,7 +113,7 @@ describe('ActivityTypes', () => {
   
   describe('GET /activity-types/:id', () => {
     
-    it('should return all activity types', (done) =>{      
+    it('should return activity type with certain Id', (done) =>{      
       chai.request(app)
 		    .get(`/api/activity-types/${testData.activityType._id}`)
         .set('x-auth-token', testData.clientToken)
@@ -133,7 +133,7 @@ describe('ActivityTypes', () => {
 
   describe('PUT /activity-types/:id', () => {
     
-    it('should return all activity types', (done) =>{      
+    it('should update activity type with a certain Id', (done) =>{      
       chai.request(app)
 		    .put(`/api/activity-types/${testData.activityType._id}`)
         .set('x-auth-token', testData.adminToken)
@@ -156,7 +156,7 @@ describe('ActivityTypes', () => {
   
   describe('DELETE /activity-types/:id', () => {
     
-    it('should return all activity types', (done) =>{      
+    it('should delete activity type with a certain Id', (done) =>{      
       chai.request(app)
 		    .delete(`/api/activity-types/${testData.activityType._id}`)
         .set('x-auth-token', testData.adminToken)
@@ -216,7 +216,7 @@ describe('ActivityTypes', () => {
   });
   
   describe('PUT /activity-types/addition-requests/:id/verify', () => {
-    it('should return all activity types requests', (done) =>{      
+    it('should update activity types request with a certain Id', (done) =>{      
       chai.request(app)
 		    .put(`/api/activity-types/addition-requests/${testData.activityType._id}/verify`)
         .set('x-auth-token', testData.adminToken)
