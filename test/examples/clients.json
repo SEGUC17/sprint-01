@@ -1,0 +1,30 @@
+[
+  {
+    "_id": "507f1f77bcf86cd799439011",
+    "username": "john.doe",
+    "password": "12345",
+    "name": {
+      "first": "John",
+      "last": "Doe"
+    },
+    "mobile": "012212345678",
+    "email": "john.doe@gmail.com",
+    "media": {
+      "profilePicture": null
+    }
+  },
+  {
+    "_id": "507f1f77bcf86cd799439011",
+    "username": "btngan",
+    "password": "12345",
+    "name": {
+      "first": "John",
+      "last": "Doe"
+    },
+    "mobile": "012212345678",
+    "email": "john.doe@gmail.com",
+    "media": {
+      "profilePicture": null
+    }
+  }
+]

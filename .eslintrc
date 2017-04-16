@@ -1,0 +1,14 @@
+{
+  "extends": "airbnb-base",
+  "plugins": [
+    "import"
+  ],
+  "env": {
+    "mocha": true
+  },
+  "rules": {
+    "no-underscore-dangle": "off",
+    "class-methods-use-this": "off",
+    "max-len": [2, 120, 4, {"ignoreUrls": true}]
+  }
+}

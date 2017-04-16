@@ -1,0 +1,58 @@
+[
+  {
+    "_id": "58ef3182493f031b1cd66b70",
+    "name": "KFC",
+    "description": "American fast food restaurant chain that specializes in fried chicken",
+    "location": {
+      "longitude": 31.235712,
+      "latitude": 30.044420
+    },
+    "openingHours": {
+      "from": 12,
+      "to": 2
+    },
+    "media": {
+      "logo": null
+    },
+    "contactInfo": {
+      "telephones": [
+        "19019"
+      ],
+      "website": "https://www.kfc.com/",
+      "facebook": "https://www.facebook.com/kfc",
+      "twitter": "https://twitter.com/kfc"
+    },
+    "owner": "507f1f77bcf86cd799439011",
+    "activites": [
+      "507f1f77bcf86cd799439011"
+    ]
+  },
+  {
+    "_id": "58ef3182493f031b1cd66b71",
+    "name": "McDonald's",
+    "description": "American hamburger and fast food restaurant chain",
+    "location": {
+      "longitude": 31.235712,
+      "latitude": 30.044420
+    },
+    "openingHours": {
+      "from": 8,
+      "to": 22
+    },
+    "media": {
+      "logo": null
+    },
+    "contactInfo": {
+      "telephones": [
+        "19991"
+      ],
+      "website": "https://www.mcdonalds.com/",
+      "facebook": "https://www.facebook.com/mcdonalds/",
+      "twitter": "https://twitter.com/mcdonalds"
+    },
+    "owner": "507f1f77bcf86cd799439011",
+    "activites": [
+      "507f1f77bcf86cd799439011"
+    ]
+  }
+]
