@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import _ from 'lodash';
+import bcrypt from '../auth/bcrypt';
 
 import config from '../constants/config';
 
@@ -7,6 +8,7 @@ import User from './models/user';
 import Business from './models/business';
 import Activity from './models/activity';
 import ActivityType from './models/activityType';
+
 
 import errors from '../constants/errors'
 
@@ -49,12 +51,30 @@ export default class Database {
 
     })
   }
+  
+  validateUserPassword(username, password ) {
+    return new Promise((resolve, reject)=>{
+      this.getUserByUsername(username)
+      .then((user) => {
+
+        if (!bcrypt.compare(password, user.password)) {
+          return reject(errors.PASSWORD_MISMATCH);
+        }
+        return resolve(user);
+      })
+      .catch((error)=>reject(error))
+
+    })
+  }
 
   /** Clients */
 
   insertOneClient(client) {
-    return User.create({ ...client, isAdmin: false })
-      .then(createdClient => this.obscureMongooseObjectPassword(createdClient));
+    return new Promise((resolve, reject)=>{
+      User.create({ ...client, isAdmin: false })
+      .then(createdClient => resolve(this.obscureMongooseObjectPassword(createdClient)))
+      .catch(error=>reject(errors.BAD_REQUEST(errors.message)))
+    })
   }
 
 
@@ -90,8 +110,11 @@ export default class Database {
   /** Admins */
 
   insertOneAdmin(admin) {
-    return User.create({ ...admin, isAdmin: true })
-      .then(createdAdmin => this.obscureMongooseObjectPassword(createdAdmin));
+    return new Promise((resolve, reject)=>{
+      User.create({ ...admin, isAdmin: true })
+      .then(createdAdmin => resolve(this.obscureMongooseObjectPassword(createdAdmin)))
+      .catch(error=>reject(errors.BAD_REQUEST(errors.message)))
+    })
   }
 
   insertAdmins(admins) {
