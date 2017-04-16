@@ -36,7 +36,7 @@ export default class Database {
 
   /** Users */
 
-  getUserByUsername({ username }) {
+  getUserByUsername(username ) {
     return new Promise((resolve, reject)=>{
       User.findOne({ username }).exec()
       .then((user)=>{
@@ -122,6 +122,17 @@ export default class Database {
   deleteAdminById(_id) {
     return User.findOneAndRemove({ _id, isAdmin: true }).select('-password').exec();
   }
+  
+  isBusinessOwner(username) {
+    return new Promise((resolve, reject)=>{
+      this.getBusinessByOwnerUsername(username)
+      .then((business)=> resolve(business))
+      .catch(()=>reject(errors.NOT_BUSINESS))
+
+    }) 
+  }
+
+  NOT_BUSINESS
 
   /** Businesses */
 
@@ -142,7 +153,38 @@ export default class Database {
   }
 
   getBusinessById(_id) {
-    return Business.findOne({ _id, isVerified: true }).exec();
+    return new Promise((resolve, reject)=>{
+      Business.findOne({ _id, isVerified: true }).exec()
+      .then((business)=>{
+        if(_.isEmpty(business))
+          return reject(errors.BUSINESS_NOT_FOUND);
+        resolve(business);
+      })
+      .catch((error)=>reject(errors.BAD_REQUEST(error.message)))
+
+    }) 
+  }
+  getBusinessByOwnerId(_id) {
+    
+    return new Promise((resolve, reject)=>{
+      Business.findOne({ owner:_id, isVerified: true }).exec()
+      .then((business)=>{
+        if(_.isEmpty(business))
+          return reject(errors.BUSINESS_NOT_FOUND);
+        resolve(business);
+      })
+      .catch((error)=>reject(errors.BAD_REQUEST(error.message)))
+
+    }) 
+  }
+  
+  getBusinessByOwnerUsername(username) {
+    return new Promise((resolve, reject)=>{
+      this.getUserByUsername(username)
+      .then((user)=>this.getBusinessByOwnerId(user._id))
+      .then((business)=>resolve(business))
+      .catch((error)=>reject(error))
+    })
   }
   
   getBusinessOfActivity(activityId) {
@@ -164,20 +206,39 @@ export default class Database {
     return Business.findOneAndUpdate({ _id, isVerified: true }, updates, { new: true }).exec();
   }
 
+  addActivityToBusiness(businessId, activityId) {
+    return new Promise((resolve, reject)=>{
+      Business.findOneAndUpdate({ _id:businessId, isVerified: true }, { $push: { 'activities':activityId} }, { new: true }).exec()
+      .then((business)=>{
+        if(_.isEmpty(business))
+          reject(errors.USER_NOT_FOUND)
+        
+        resolve(business)
+      })
+      .catch((error)=> reject(error))
+
+    })
+  }
+
   deleteBusinessById(_id) {
     return Business.findOneAndRemove({ _id, isVerified: true }).exec();
   }
 
-  isRightfulBusinessOwner(ownerId, businessId) {
+  isRightfulBusinessOwner(username, businessId) {
+    let userId; 
     return new Promise((resolve, reject) => {
-      this.getBusinessById(businessId)
-        .then((business)=>{
-          
-          if (ownerId === business.owner.toString()) return resolve();
-          
-          return reject();
+      this.getUserByUsername(username)
+      .then((user)=>{
+        userId = user._id
+        return getBusinessByOwnerId(userId);
+      })
+      .then((business)=>{
 
-        })
+        if (userId.toString() === business.owner.toString()) 
+          return resolve();
+        
+        return reject(errors.UNRIGHTFUL_BUSINESS_OWNER);
+      })
     });
   }
 
@@ -217,8 +278,20 @@ export default class Database {
 
   /** Activities  */
   
-  insertOneActivity(activity) {
-    return Activity.create(activity);
+  insertOneActivity(activity, businessId) {
+    let activityDoc; 
+    return new Promise((resolve, reject)=>{
+      Activity.create(activity)
+      .then((activity)=>{
+        activityDoc = activity; 
+        return this.addActivityToBusiness(businessId, activity._id)
+      })
+      .then((business)=>{
+        resolve(activityDoc);
+      })
+      .catch((error)=>reject(errors.BAD_REQUEST(error.errors)))
+
+    })
   }
 
   insertActivities(activities) {
@@ -248,15 +321,35 @@ export default class Database {
   }
 
   searchActivities(query) {
-    return Activity.find({ ...query, isVerified: false }).exec();
+    return new Promise((resolve, reject) => {
+      Activity.find({name: { $regex: new RegExp(query, 'i') }}).exec()
+      .then((activities)=> resolve(activities))
+      .catch(()=>reject(errors.INTERNAL_SERVER_ERROR))
+    });
   }
 
   updateActivityById(_id, updates) {
-    return Activity.findOneAndUpdate(_id, updates, { new: true }).exec();
+    return new Promise((resolve, reject) => {
+      Activity.findOneAndUpdate(_id, updates, { new: true }).exec()
+      .then((activity)=>{
+        if(_.isEmpty(activity))
+          reject(errors.ACTIVITY_NOT_FOUND);
+        resolve(activity)
+      })
+      .catch(()=>reject(errors.INTERNAL_SERVER_ERROR))
+    })
   }
 
   deleteActivityById(_id) {
-    return Activity.findOneAndRemove({ _id, isVerified: false }).exec();
+    return new Promise((resolve, reject) => {
+      Activity.findOneAndRemove({ _id}).exec()
+      .then((activity)=>{
+        if(_.isEmpty(activity))
+          reject(errors.ACTIVITY_NOT_FOUND);
+        resolve(null)
+      })
+      .catch(()=>reject(errors.INTERNAL_SERVER_ERROR))
+    });
   }
 
   /** Activities Booking  */
@@ -338,7 +431,7 @@ export default class Database {
       this.getBusinessOfActivity(activityId)
       .then((business)=> {
         activityBusiness = business;
-        return this.getUserByUsername({username});
+        return this.getUserByUsername(username);
       })
       .then((user)=>{
         if(activityBusiness.owner.toString() === user._id.toString())
@@ -346,7 +439,7 @@ export default class Database {
         reject(errors.UNRIGHTFUL_ACTIVITY_OWNER);
       })
 
-      .catch((error)=>reject(error));
+      .catch((error)=>reject(errors.UNRIGHTFUL_ACTIVITY_OWNER));
 
     });
   }
@@ -403,7 +496,11 @@ export default class Database {
     return new Promise((resolve, reject)=>{
       this.getActivityTypeById(_id)
       .then(()=>ActivityType.findOneAndRemove({ _id}).exec())
-      .then((x)=>resolve(null))
+      .then((activityType)=>{
+        if(_.isEmpty(activityType))
+          reject(errors.ACTIVITY_NOT_FOUND);
+        resolve(null)
+      })
       .catch((error)=>reject(error))
     }); 
   }

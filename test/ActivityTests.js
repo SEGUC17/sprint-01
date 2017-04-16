@@ -8,6 +8,8 @@ import businesses from './examples/businesses.json';
 
 import jwt from '../src/auth/jwt';
 import mongoose from 'mongoose';
+let ObjectId = mongoose.Types.ObjectId;
+import _ from 'lodash'
 
 import app from '../src/app';
 
@@ -17,35 +19,27 @@ import User from '../src/persistence/models/user';
 import Business from '../src/persistence/models/business';
 import errors from '../src/constants/errors';
 
+import clientExamples from './examples/clients.json';
+import businessExamples from './examples/businesses.json';
+
+
 const expect = chai.expect;
 chai.use(chaiAsPromised);
 chai.use(chaiHttp);
 
 
-
 //shall contain all persistend data to check against
 let testData = {};
-
 
 const seed = (done) => {
   mongoose.connection.dropDatabase(error => {
     if(error){
-      console.log('Error', error);
       process.exit(0);
     }
 
-
-    testData.userDoc = {
-      username: 'userTester',
-      email: 'tester@test.test',
-      role: "CLIENT",
-    };
-    testData.businessUserDoc = {
-      username: 'businessTester',
-      email: 'tester@test.test',
-      role: "BUSINESS",
-    };
-
+    testData.userDoc = _.omit(clientExamples[0],'_id');
+    testData.businessUserDoc = _.omit(clientExamples[1],'_id');
+    
     testData.clientToken = jwt.sign(testData.userDoc);
     testData.businessToken = jwt.sign(testData.businessUserDoc);
     testData.adminToken = jwt.sign({ username: 'admin', role: 'ADMIN' });
@@ -57,17 +51,15 @@ const seed = (done) => {
 
     testData.activityDoc = { 
       name: 'testActivity',
-      isConfirmed: "true",
+      isConfirmed: true,
     }
     
-    testData.businessDoc = { 
-      name: 'breakout',
-    }
+    testData.businessDoc = _.omit(businessExamples[0],'_id');
     
     new User(testData.userDoc).save()
     .then((user)=>{
       testData.userDoc = user;
-      testData.activityDoc.bookings = [{client:user._id}];
+      testData.activityDoc.bookings = [{client:user._id, isConfirmed:true}];
       return new User(testData.businessUserDoc).save();
     })
     .then((businessUser)=>{
@@ -83,24 +75,30 @@ const seed = (done) => {
     })
     .then((activity)=>{
       testData.activityDoc = activity;
-      testData.businessDoc.activites = [activity._id];
-      
+      testData.businessDoc.activities = [activity._id];
+      testData.businessDoc.isVerified = true;
       return new Business(testData.businessDoc).save(); 
     })
     .then((business)=>{
       testData.businessDoc = business;
+
       done();
+    })
+    .catch((err)=>{
+      console.log(err.message);
     })
 
   });
 }
-describe('ActivityBooking', () => {
+
+describe('Activity', () => {
   before(seed); 
 
   describe('GET /activities', () => {
     it('should return correct data', (done) =>{      
       chai.request(app)
 		    .get(`/api/activities`)
+        .set('x-auth-token', testData.clientToken)        
 		    .end((err, res) => {
 			  	expect(res).to.have.status(200);
 			  	expect(res.body.error).to.be.null;
@@ -116,8 +114,9 @@ describe('ActivityBooking', () => {
   describe('GET /activities/search', () => {
     it('should return correct data if a correct name was used', (done) =>{
       chai.request(app)
-		    .get(`/api/activities/search?name=testactivity`)
-		    .end((err, res) => {
+		    .get(`/api/activities/search?name=testactivity`)		    
+        .set('x-auth-token', testData.clientToken)
+        .end((err, res) => {
 			  	expect(res).to.have.status(200);
 			  	expect(res.body.error).to.be.null;
 			  	expect(res.body.data).to.be.an('array');
@@ -131,6 +130,7 @@ describe('ActivityBooking', () => {
     it('should return correct data if a part of the name was used', (done) =>{
       chai.request(app)
 		    .get(`/api/activities/search?name=st`)
+        .set('x-auth-token', testData.clientToken)        
 		    .end((err, res) => {
 			  	expect(res).to.have.status(200);
 			  	expect(res.body.error).to.be.null;
@@ -145,6 +145,7 @@ describe('ActivityBooking', () => {
     it('should return empty data if no matching names in activites', (done) =>{
       chai.request(app)
 		    .get(`/api/activities/search?name=xyz`)
+        .set('x-auth-token', testData.clientToken)        
 		    .end((err, res) => {
 			  	expect(res).to.have.status(200);
 			  	expect(res.body.error).to.be.null;
@@ -161,6 +162,7 @@ describe('ActivityBooking', () => {
 
       chai.request(app)
 		    .get(`/api/activities/${testData.activityDoc._id}`)
+        .set('x-auth-token', testData.clientToken)        
 		    .end((err, res) => {
 			  	expect(res).to.have.status(200);
 			  	expect(res.body.error).to.be.null;
@@ -171,14 +173,15 @@ describe('ActivityBooking', () => {
 
     });
     
-    it('should return null object if no activity found with that id', (done) =>{  
+    it('should return 404 if no activity found with that id', (done) =>{  
 
       chai.request(app)
 		    .get(`/api/activities/${testData.userDoc._id}`)
+        .set('x-auth-token', testData.clientToken)        
 		    .end((err, res) => {
-			  	expect(res).to.have.status(200);
-			  	expect(res.body.error).to.be.null;
+			  	expect(res).to.have.status(404);
           expect(res.body.data).to.be.null;
+			  	expect(res.body.error).to.equal(errors.ACTIVITY_NOT_FOUND.message);
 		      done();
       });
 
@@ -193,8 +196,10 @@ describe('ActivityBooking', () => {
 		    .end((err, res) => {
 			  	expect(res).to.have.status(401);
 			  	expect(res.body.data).to.be.null;
-			  	expect(res.body.error).to.equal(errors.invalidToken.message);
-		      done();
+			  	expect(res.body.error).to.equal(errors.INVALID_TOKEN.message);
+          
+		      
+          done();
       });
 
     });
@@ -206,26 +211,94 @@ describe('ActivityBooking', () => {
 		    .end((err, res) => {
 			  	expect(res).to.have.status(403);
 			  	expect(res.body.data).to.be.null;
-			  	expect(res.body.error).to.equal(errors.notBusiness.message);
+			  	expect(res.body.error).to.equal(errors.NOT_BUSINESS.message);
 		      done();
       });
 
     });
     
-    it('should create activity with minimal data', (done) =>{  
-
+    it('should create document bookings', (done) =>{  
       chai.request(app)
 		    .post(`/api/activities`)
         .set('x-auth-token', testData.businessToken)
-        .send({
+        .send({ 
           name: 'testActivity2',
-          activityType: testData.activityDoc.activityType,
+          isConfirmed: true,
+          activityType: testData.activityDoc.activityType
         })
 		    .end((err, res) => {
-			  	expect(res).to.have.status(201);
+			  	expect(res).to.have.status(200);
 			  	expect(res.body.error).to.be.null;
-          expect(res.body.data).to.not.be.empty;
+			  	expect(res.body.data.name).to.equal("testActivity2");
           
+          testData.activityDoc = res.body.data;
+		      
+          done();
+      });
+
+    });
+  });
+
+  describe('PUT /activities/:id', () => {
+
+    
+    it('should ensure that the issuer role is activity owner', (done) =>{  
+      chai.request(app)
+		    .put(`/api/activities/${testData.activityDoc._id}`)
+        .set('x-auth-token', testData.clientToken)
+        .send({
+          name:'testActivity3'
+        })
+		    .end((err, res) => {
+			  	expect(res).to.have.status(403);
+			  	expect(res.body.data).to.be.null;
+			  	expect(res.body.error).to.equal(errors.UNRIGHTFUL_ACTIVITY_OWNER.message);
+		      done();
+      });
+
+    });
+    
+    it('should create document bookings', (done) =>{  
+      chai.request(app)
+		    .put(`/api/activities/${testData.activityDoc._id}`)
+        .set('x-auth-token', testData.businessToken)
+        .send({
+          name:'testActivity3'
+        })
+		    .end((err, res) => {
+			  	expect(res).to.have.status(200);
+			  	expect(res.body.error).to.be.null;
+			  	expect(res.body.data.name).to.equal("testActivity3");
+		      done();
+      });
+
+    });
+  });
+  
+  describe('DELETE /activities/:id', () => {
+
+    
+    it('should ensure that the issuer role is activity owner', (done) =>{  
+      chai.request(app)
+		    .delete(`/api/activities/${testData.activityDoc._id}`)
+        .set('x-auth-token', testData.clientToken)
+		    .end((err, res) => {
+			  	expect(res).to.have.status(403);
+			  	expect(res.body.data).to.be.null;
+			  	expect(res.body.error).to.equal(errors.UNRIGHTFUL_ACTIVITY_OWNER.message);
+		      done();
+      });
+
+    });
+    
+    it('should create document bookings', (done) =>{  
+      chai.request(app)
+		    .delete(`/api/activities/${testData.activityDoc._id}`)
+        .set('x-auth-token', testData.businessToken)
+		    .end((err, res) => {
+			  	expect(res).to.have.status(200);
+			  	expect(res.body.error).to.be.null;
+			  	expect(res.body.data).to.be.null;
 		      done();
       });
 
@@ -235,3 +308,4 @@ describe('ActivityBooking', () => {
   
 
 });
+

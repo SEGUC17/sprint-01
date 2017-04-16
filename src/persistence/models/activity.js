@@ -59,7 +59,6 @@ const activitySchema = mongoose.Schema({
       isConfirmed: {
         type: Boolean,
         required: true,
-        default: false,
       },
     }),
   ],
