@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const db = new Database();
 
-if (process.env.NODE_ENV === 'TEST') {
+if (process.env.NODE_ENV === 'DEV') {
   db.connect()
     .then(() => {
       if (config.database.reseed) db.drop();
@@ -43,6 +43,10 @@ if (process.env.NODE_ENV === 'TEST') {
     .catch((err) => {
       console.error(err.message);
     });
+} else {
+  db.connect();
 }
 
 app.use('/api/', api({ db }));
+
+export default app;
